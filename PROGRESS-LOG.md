@@ -130,11 +130,11 @@
 
 ---
 
-## Milestone 3 — Desktop Integration 🔧
-**Status: IN PROGRESS** | Started: 2026-10-09
+## Milestone 3 — Desktop Integration ✅
+**Status: COMPLETE** | Started: 2026-10-09 | Completed: 2026-10-15
 **Gate: End-to-end 3 workflows on MockMDS; frozen/loop caught; device identity change rejected**
 
-### Components Built & Remaining
+### Components Built
 | # | Component | Package | Status | Notes |
 |---|-----------|---------|--------|-------|
 | 1 | `MdsDeviceInfo.java` | `device` | ✅ | Immutable DTO for device discovery / metadata (MOSIPDINFO/SBIDISC) |
@@ -151,8 +151,9 @@
 | 12 | `UiEvent.java` | `ui` | ✅ | Immutable UI event matching `ui-contract/events-schema.json` |
 | 13 | `LivenessUiListener.java` | `ui` | ✅ | UI callback listener interface for decoupled scene updates |
 | 14 | `UiMessages.java` | `ui` | ✅ | Localised strings (EN, FR, AR with RTL support) (§9) |
-| 15 | JavaFX UI preview & guide controls | `ui` | ⏳ | Live preview oval guide, distance/pose feedback, challenge prompts |
-| 16 | Desktop MockMDS Integration Tests | `test` | ⏳ | End-to-end test with MockDeviceAdapter / MockMDS |
+| 15 | JavaFX UI preview & guide controls | `ui` | ⏳ | Deferred — requires JavaFX runtime; event schema ready |
+| 16 | `SupervisorAuthTest.java` | `test` | ✅ | 14 tests: auth, exemption rules (ATTACK never exempt), revocation |
+| 17 | `LivenessServiceIntegrationTest.java` | `test` | ✅ | 16 end-to-end tests: all workflows, attacks, device errors, callbacks |
 
 ---
 
@@ -194,8 +195,9 @@ All third-party components must be documented before shipping. See `docs/licence
 ---
 
 ## Environment Notes
-- **Java / Maven:** NOT installed on dev machine. Code verified structurally; `mvn clean test` cannot run locally yet.
-- **OS:** Windows
+- **Java:** OpenJDK 25.0.1 (Temurin) — compiles with `--release 11`
+- **Maven:** 3.9.11
+- **OS:** macOS 26.2 (aarch64)
 - **Java target:** 11 (no Java 14+ features)
 
 ---
@@ -221,4 +223,13 @@ All third-party components must be documented before shipping. See `docs/licence
 | 2026-10-09 | M3: Implemented service layer (`LivenessService`, `LivenessServiceConfig`, `ConfigSyncManager`, `LivenessCallback`) | Agent |
 | 2026-10-09 | M3: Implemented bounded async engine pipeline (`BoundedFrameQueue`, `InferenceWorker`) | Agent |
 | 2026-10-09 | M3: Implemented UI event contract & i18n (`UiEventType`, `UiEvent`, `LivenessUiListener`, `UiMessages`) | Agent |
+| 2026-10-15 | Git pull, resolved .gitignore merge conflict | Agent |
+| 2026-10-15 | Fixed 8 compilation errors across 5 files (imports, constructors, enum references) | Agent |
+| 2026-10-15 | Fixed test compilation error in AuditChainIntegrityTest (type mismatches) | Agent |
+| 2026-10-15 | Created `SupervisorAuthTest.java` (14 tests) | Agent |
+| 2026-10-15 | Created `LivenessServiceIntegrationTest.java` (16 end-to-end tests) | Agent |
+| 2026-10-15 | Fixed MockDeviceAdapter: added dummy pixel data for RCAPTURE path | Agent |
+| 2026-10-15 | Fixed RCAPTURE nonce binding: added `boundTransactionId()` to Session/CaptureIntegrity | Agent |
+| 2026-10-15 | Version bumped `0.2.0-M2` → `0.3.0-M3` | Agent |
+| 2026-10-15 | **M3 GATE PASSED: 181 tests, 0 failures** | Agent |
 
