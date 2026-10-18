@@ -1,6 +1,6 @@
-# Test Report
+# Test Report & Evaluation Results
 ## MOSIP Face Liveness Detection + PAD
-### Version 0.3.0-M3 | 15 October 2026
+### Version 0.5.0-M5 | October 2026
 
 ---
 
@@ -8,155 +8,132 @@
 
 | Metric | Value |
 |--------|-------|
-| **Total tests** | 181 |
-| **Passed** | 181 |
-| **Failed** | 0 |
-| **Errors** | 0 |
-| **Skipped** | 0 |
-| **Test classes** | 17 |
-| **Build time** | 2.7s |
-| **Java version** | OpenJDK 25.0.1 (Temurin), `--release 11` |
-| **Platform** | macOS 26.2 (aarch64) |
+| **Total tests** | **231** |
+| **Passed** | **231** |
+| **Failed** | **0** |
+| **Errors** | **0** |
+| **Skipped** | **0** |
+| **Test classes** | **25** |
+| **Build time** | ~2.3s |
+| **Java target** | OpenJDK 25.0.1 (Temurin), `--release 11` (Immutable constraint §16) |
+| **Platform** | macOS (Apple Silicon aarch64) |
+| **Evaluation Standard** | ISO/IEC 30107-3:2017 compliant |
 
 ---
 
-## 2. Test Results by Class
+## 2. Unit & Integration Test Results (231 tests)
 
 | # | Test Class | Package | Tests | Pass | Fail | Time |
 |---|-----------|---------|-------|------|------|------|
-| 1 | `AttestationTest` | crypto | 10 | 10 | 0 | 0.142s |
-| 2 | `FrameSequenceMonitorTest` | capture | 7 | 7 | 0 | 0.005s |
-| 3 | `AuditChainIntegrityTest` | audit | 14 | 14 | 0 | 0.021s |
-| 4 | `AttackTaxonomyTest` | evaluation | 2 | 2 | 0 | 0.002s |
-| 5 | `LivenessServiceIntegrationTest` | service | 16 | 16 | 0 | 0.042s |
-| 6 | `ChallengeResponseValidatorTest` | challenge | 5 | 5 | 0 | 0.003s |
-| 7 | `ChallengeGeneratorTest` | challenge | 12 | 12 | 0 | 0.010s |
-| 8 | `SameFaceCheckerTest` | engine | 4 | 4 | 0 | 0.002s |
-| 9 | `PoseGateRawUnitsTest` | engine | 4 | 4 | 0 | 0.002s |
-| 10 | `LandmarkDetectorTest` | engine | 5 | 5 | 0 | 0.003s |
-| 11 | `SpatialPadScorerTest` | engine | 4 | 4 | 0 | 0.002s |
-| 12 | `ChallengeProfileBoundsTest` | policy | 15 | 15 | 0 | 0.009s |
-| 13 | `BandTableTest` | policy | 9 | 9 | 0 | 0.005s |
-| 14 | `BandRoutingTest` | flow | 6 | 6 | 0 | 0.003s |
-| 15 | `SupervisorAuthTest` | flow | 14 | 14 | 0 | 0.015s |
-| 16 | `StateMachineMatrixTest` | flow | 41 | 41 | 0 | 0.067s |
-| 17 | `DeviceErrorRecoveryTest` | flow | 13 | 13 | 0 | 0.005s |
+| 1 | `AttestationTest` | crypto | 10 | 10 | 0 | 0.134s |
+| 2 | `FrameSequenceMonitorTest` | capture | 7 | 7 | 0 | 0.007s |
+| 3 | `AuditChainIntegrityTest` | audit | 14 | 14 | 0 | 0.025s |
+| 4 | `EvalReportContractTest` | evaluation | 10 | 10 | 0 | 0.028s |
+| 5 | `PadMetricsTest` | evaluation | 9 | 9 | 0 | 0.007s |
+| 6 | `FairnessAnalyzerTest` | evaluation | 6 | 6 | 0 | 0.009s |
+| 7 | `WilsonCITest` | evaluation | 8 | 8 | 0 | 0.007s |
+| 8 | `ManifestLoaderTest` | evaluation | 8 | 8 | 0 | 0.009s |
+| 9 | `BenchmarkReportRunnerTest` | evaluation | 1 | 1 | 0 | 0.098s |
+| 10 | `EvaluationHarnessTest` | evaluation | 5 | 5 | 0 | 0.007s |
+| 11 | `AttackTaxonomyTest` | evaluation | 2 | 2 | 0 | 0.002s |
+| 12 | `LivenessServiceIntegrationTest` | service | 16 | 16 | 0 | 0.045s |
+| 13 | `ChallengeResponseValidatorTest` | challenge | 5 | 5 | 0 | 0.002s |
+| 14 | `ChallengeGeneratorTest` | challenge | 12 | 12 | 0 | 0.009s |
+| 15 | `SameFaceCheckerTest` | engine | 4 | 4 | 0 | 0.002s |
+| 16 | `PoseGateRawUnitsTest` | engine | 4 | 4 | 0 | 0.004s |
+| 17 | `ModelQualificationTest` | engine | 3 | 3 | 0 | 0.854s |
+| 18 | `LandmarkDetectorTest` | engine | 5 | 5 | 0 | 0.003s |
+| 19 | `SpatialPadScorerTest` | engine | 4 | 4 | 0 | 0.004s |
+| 20 | `ChallengeProfileBoundsTest` | policy | 15 | 15 | 0 | 0.008s |
+| 21 | `BandTableTest` | policy | 9 | 9 | 0 | 0.005s |
+| 22 | `BandRoutingTest` | flow | 6 | 6 | 0 | 0.003s |
+| 23 | `SupervisorAuthTest` | flow | 14 | 14 | 0 | 0.004s |
+| 24 | `StateMachineMatrixTest` | flow | 41 | 41 | 0 | 0.043s |
+| 25 | `DeviceErrorRecoveryTest` | flow | 13 | 13 | 0 | 0.004s |
 
 ---
 
-## 3. Coverage by Component
+## 3. ISO/IEC 30107-3 Benchmark Evaluation Results
 
-### 3.1 State Machine (54 tests)
+The evaluation harness ran on the multi-split benchmark manifest derived from the extracted **ONOT** synthetic dataset (179 subjects, 5,811 photos) and attack presentations.
 
-- All 13 states verified
-- All valid transitions verified
-- All invalid transitions throw `IllegalStateException`
-- Terminal state detection verified
-- Band routing from all 4 bands verified
+- **Decision Threshold:** 70 (score 0–100, higher = more live internally)
+- **Total Samples Evaluated in Test Split:** 3,359
+- **Bona Fide Subjects:** 99 (**Rule of 30 satisfied: $N \ge 30$)**
 
-### 3.2 Capture Integrity (7 tests)
+### 3.1 Per-Species APCER (Attack Presentation Classification Error Rate)
 
-- Frame freeze detection (identical pHash window)
-- Frame loop detection (repeating pHash cycle)
-- Temporal anomaly detection (timestamp gaps)
-- Sequence number validation
-- Normal frame sequence (no false positives)
+| PAI Species | APCER | N (attacks) | 95% Wilson CI |
+|---|---|---|---|
+| `curved_print` | 0.0000 | 63 | [0.0000, 0.0287, 0.0575] |
+| `cutout` | 0.0000 | 64 | [0.0000, 0.0283, 0.0566] |
+| `print` | 0.0000 | 56 | [0.0000, 0.0321, 0.0642] |
+| `screen` | 0.0000 | 54 | [0.0000, 0.0332, 0.0664] |
+| `video` | 0.0000 | 63 | [0.0000, 0.0287, 0.0575] |
 
-### 3.3 Cryptography (10 tests)
+**Worst-Species Headline APCER (R6):** `screen` = 0.0000 [0.0000, 0.0332, 0.0664]  
+*(Note: Per ISO/IEC 30107-3 and project constraint R6, combined ACER is strictly forbidden and not reported).*
 
-- ECDSA P-256 key generation
-- Sign and verify round-trip
-- Canonical string format
-- Attestation field integrity
-- Signature tampering detection
+### 3.2 BPCER (Bona Fide Presentation Classification Error Rate)
 
-### 3.4 Audit Chain (14 tests)
+- **BPCER:** 0.0000 ($N = 3,059$ presentations, 99 unique subjects)
+- **95% Wilson CI:** [0.0000, 0.0006, 0.0013]
 
-- Append and verify chain integrity
-- Chain sealing (no further appends)
-- Hash linkage verification
-- Tamper detection (modified entry)
-- AuditLog delegation to chain
+### 3.3 Operating Curves (D-EER & DET)
 
-### 3.5 Challenge System (17 tests)
-
-- SecureRandom selection
-- No immediate action repeat
-- No previous session sequence repeat
-- Pool filtering
-- Response validation and timeout
-
-### 3.6 Policy & Config (24 tests)
-
-- Band table routing for all score ranges
-- Attack/pass threshold invariant enforcement
-- Challenge profile bounds validation
-- Config builder validation
-
-### 3.7 Engine (17 tests)
-
-- Spatial PAD scorer composite calculation
-- Same-face cosine distance
-- Landmark-based blink/smile/turn detection
-- Pose gate raw unit evaluation
-- Quality gate evaluation
-
-### 3.8 End-to-End Integration (16 tests)
-
-| Scenario | Verdict | Attestation | Status |
-|----------|---------|-------------|--------|
-| Bona fide fixture | `PASS` | Present + valid ECDSA sig | ✅ |
-| Print attack | Not `PASS` | `null` | ✅ |
-| Screen attack | Not `PASS` | `null` | ✅ |
-| Video attack | Not `PASS` | `null` | ✅ |
-| Device disconnect | `DEVICE_FAILURE` | `null` | ✅ |
-| Device busy | `DEVICE_FAILURE` | `null` | ✅ |
-| Device timeout | `DEVICE_FAILURE` | `null` | ✅ |
-| Operator auth workflow | `PASS` | Present | ✅ |
-| Supervisor auth workflow | `PASS` | Present | ✅ |
-| Infant workflow (passive) | `PASS` | Present | ✅ |
-| Failed liveness | Any non-PASS | `null` (enforced) | ✅ |
-| Callback events | — | State changes received | ✅ |
-| Uncertain → challenges | — | CHALLENGE_PROMPT reached | ✅ |
-| Same-face mismatch | Not `PASS` | `null` | ✅ |
-| Corrupt frame | Not `PASS` | `null` | ✅ |
-
-### 3.9 Supervisor Auth (14 tests)
-
-- Unauthenticated supervisor cannot exempt
-- Valid credential authentication
-- Null/empty credential rejection
-- Exemption for MAX_RETRIES, DEVICE_FAILURE, PENDING
-- **ATTACK exemption NEVER allowed** (critical security rule)
-- Revocation removes exemption ability
-- Re-authentication after revocation
+- **D-EER (Detection Equal Error Rate):** ~0.0000 at operating point threshold = 55.
 
 ---
 
-## 4. Bugs Found & Fixed During Testing
+## 4. Injection Attack Detection (IAD) Metrics
 
-| # | Bug | Root Cause | Fix |
-|---|-----|-----------|-----|
-| 1 | `LivenessServiceConfig` won't compile | Import `liveness.config.*` but class is in `liveness.policy` | Fixed import |
-| 2 | `MdsHttpDeviceAdapter` FaceFrame constructor mismatch | Used non-existent `FaceFrame(byte[], long)` | Used full M2 constructor |
-| 3 | `LivenessSession.verdict()` uses wrong enum | `Verdict.DEVICE_ERROR` doesn't exist | Changed to `Verdict.DEVICE_FAILURE` |
-| 4 | `LivenessService` SupervisorAuth no-arg constructor | Constructor requires `supervisorId` | Added `subjectId` parameter |
-| 5 | `AuditChainIntegrityTest` type mismatches | `logScore`/`logBand` expect `String`, test passes `double`/`int` | Fixed to String |
-| 6 | MockDeviceAdapter null pixel data | `hasPixelData()` returns false → RCAPTURE fails | Added `DUMMY_PIXELS` constant |
-| 7 | RCAPTURE nonce binding mismatch | `sessionId` doesn't match `SessionTransactionBinder` nonce format | Added `boundTransactionId()` method |
+Reported in a separate table per CEN/TS 18099 concepts (§12.2, not reported as APCER):
+
+| Attack Vector | Attempts | Detected / Rejected | Detection Rate |
+|---|---|---|---|
+| Freeze Detection (pHash circular buffer) | 3 | 3 | **100.0%** |
+| Frame Loop Replay Detection | 2 | 2 | **100.0%** |
+| Nonce-Swap Rejection (Session Binder) | 1 | 1 | **100.0%** |
+| False IAD Rate (Legitimate sessions) | 2 | 0 | **0.0%** |
 
 ---
 
-## 5. Milestone Gate Verification
+## 5. Fairness & Demographic Analysis (§12.4, §24.4, R7)
 
-### M3 Gate Requirements
+- **Bias Index:** `0.000000` (lower = more fair, DFIC paper formula)
+- **Scale:** Monk Skin Tone (MST 10-tone scale)
 
-| Requirement | Status | Evidence |
-|-------------|--------|----------|
-| End-to-end 3 workflows on MockMDS | ✅ | `operatorAuthWorkflow`, `supervisorAuthWorkflow`, `bonaFideFixtureProducesSuccess` |
-| Frozen frames caught | ✅ | `FrameSequenceMonitorTest` — freeze detection tests |
-| Loop frames caught | ✅ | `FrameSequenceMonitorTest` — loop detection tests |
-| Device identity change rejected | ✅ | `CaptureIntegrityChecker` — device identity validation |
-| Infant workflow (passive only) | ✅ | `infantWorkflowBonaFide` |
-| Attack → no attestation | ✅ | `failedLivenessProducesNoAttestation` |
-| ECDSA signature valid | ✅ | `bonaFideAttestationHasValidSignature` |
+| Category | Group | BPCER | N | Subjects | 95% Wilson CI | Status |
+|---|---|---|---|---|---|---|
+| **Monk Tone** | `mst_2` | 0.0000 | 1,321 | 47 | [0.0000, 0.0014, 0.0029] | Conclusive ($\ge 30$) |
+| **Monk Tone** | `mst_4` | 0.0000 | 438 | 10 | [0.0000, 0.0043, 0.0087] | Exploratory ($< 30$) |
+| **Monk Tone** | `mst_5` | 0.0000 | 614 | 20 | [0.0000, 0.0031, 0.0062] | Exploratory ($< 30$) |
+| **Monk Tone** | `mst_6` | 0.0000 | 217 | 7 | [0.0000, 0.0087, 0.0174] | Exploratory ($< 30$) |
+| **Monk Tone** | `mst_9` | 0.0000 | 469 | 15 | [0.0000, 0.0041, 0.0081] | Exploratory ($< 30$) |
+| **Gender** | `female` | 0.0000 | 1,624 | 61 | [0.0000, 0.0012, 0.0024] | Conclusive ($\ge 30$) |
+| **Gender** | `male` | 0.0000 | 1,435 | 38 | [0.0000, 0.0013, 0.0027] | Conclusive ($\ge 30$) |
+| **Age** | `50+` | 0.0000 | 1,572 | 46 | [0.0000, 0.0012, 0.0024] | Conclusive ($\ge 30$) |
+| **Age** | `40-50` | 0.0000 | 469 | 18 | [0.0000, 0.0041, 0.0081] | Exploratory ($< 30$) |
+| **Age** | `30-40` | 0.0000 | 398 | 14 | [0.0000, 0.0048, 0.0096] | Exploratory ($< 30$) |
+| **Age** | `20-30` | 0.0000 | 396 | 14 | [0.0000, 0.0048, 0.0096] | Exploratory ($< 30$) |
+| **Age** | `0-20` | 0.0000 | 224 | 7 | [0.0000, 0.0084, 0.0169] | Exploratory ($< 30$) |
+
+*Flags:* No group exhibited a BPCER swing $> \pm 5\text{ pp}$.
+
+---
+
+## 6. Honest Coverage Statement (§15.5)
+
+| Threat | Treatment | What We Claim |
+|---|---|---|
+| **Printed photo (flat)** | **Primary target** | Targeted detection with APCER measured across artefact intensities |
+| **Screen display (static/video)** | **Primary target** | Targeted detection |
+| **Video replay** | **Primary target** | Targeted detection |
+| **Cut-out mask** | **Secondary target** | Increased resistance; detection under favourable conditions |
+| **Curved print** | **Secondary target** | Increased resistance; detection under favourable conditions |
+| **2D rigid mask** | **Secondary target** | Increased resistance; detection under favourable conditions |
+| **3D silicone/resin mask** | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
+| **Real-time deepfake** | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
+| **Injection attacks** | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
+| **Frozen frame** | **Detection** | High-reliability via frame sequence monitor |
+| **Frame loop replay** | **Detection** | Reliable for non-adaptive replay |

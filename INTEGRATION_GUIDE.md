@@ -1,6 +1,6 @@
 # Integration Guide
 ## MOSIP Face Liveness Detection + PAD
-### Version 0.3.0-M3
+### Version 0.5.0-M5
 
 ---
 
@@ -20,7 +20,7 @@ This guide explains how to integrate the face liveness detection system into the
 
 ```bash
 mvn clean package -DskipTests
-# Output: target/face-liveness-pad-0.3.0-M3.jar
+# Output: target/face-liveness-pad-0.3.0-M3.jar (or newer)
 ```
 
 ---
@@ -266,3 +266,44 @@ Supported locales: `en` (default), `fr`, `ar`
 | `ATTACK` on real face | PAD threshold too aggressive | Lower `attackThreshold` (needs calibration) |
 | All captures fail quality | Poor lighting or distance | Check `faceSizeMinPx`, improve lighting |
 | Challenge timeout | Subject too slow | Increase `challengeTimeoutMs`, use ACCESSIBILITY profile |
+
+---
+
+## 11. Running Evaluation & Benchmarks (ISO/IEC 30107-3)
+
+### 11.1 Full Test Suite
+
+Run all 231 unit and integration tests:
+
+```bash
+mvn clean test
+```
+
+### 11.2 Generating Benchmark Evaluation Report
+
+To execute the ISO/IEC 30107-3 benchmark evaluation harness against dataset manifests:
+
+```bash
+mvn test -Dtest=BenchmarkReportRunnerTest
+```
+
+This runs `EvaluationHarness` on `datasets/manifests/evaluation_benchmark_manifest.csv` and outputs a comprehensive test report:
+- `target/TEST_REPORT.md`
+- Synced to `docs/TEST_REPORT.md`
+
+The generated report includes:
+- **Per-Species APCER** with 95% Wilson confidence intervals
+- **Worst-Species Headline APCER** (ISO/IEC 30107-3 recommendation)
+- **BPCER** with 95% Wilson confidence intervals (validating Rule of 30: $N \ge 30$)
+- **Operating Points (DET & D-EER)**
+- **CEN/TS 18099 Injection Attack Detection Table** (freeze, loop, nonce-swap)
+- **Fairness & Demographic Bias Analysis** (DFIC Bias Index across Monk Skin Tone MST 10, gender, and age brackets)
+
+### 11.3 Model Qualification Test
+
+To verify ONNX model input dimensions, channel ordering (`[1, 3, 128, 128]` RGB), output logits, and file size constraints:
+
+```bash
+mvn test -Dtest=ModelQualificationTest
+```
+

@@ -57,3 +57,15 @@
 **Context:** Auth-purpose devices have no STREAM, no preview.  
 **Decision:** Assume DISCRETE mode; document the limitation.  
 **Consequence:** Liveness evidence is reduced for auth devices; same-face check + time gap compensate.
+
+## ADR-008: Dataset & PAD Model Selection for Evaluation (M5)
+
+**Date:** 2026-10-19  
+**Status:** DECIDED (R1, §17.1, §17.4)  
+**Context:** Idiap Replay-Attack and OULU-NPU require strict academic EULAs with permanent faculty signatures. In addition, the primary PAD model's actual export spec is 128x128 RGB rather than 80x80 BGR.  
+**Decision:**
+1. **Model:** Adopted `MiniFASNetV2-SE` ONNX export from `facenox/face-antispoof-onnx` (FP32 ~1.82MB, INT8 ~612KB) verified empirically via `ModelQualificationTest` with 128x128 RGB input.
+2. **Bona Fide Dataset:** Use ONOT synthetic ICAO dataset (179 subjects, 5,811 images) ensuring complete ethical compliance and exceeding the Rule of 30 ($N=99 \ge 30$).
+3. **Attack Evaluation:** Sourced replay attack video fixtures and Kaggle open alternatives (*Antispoofing Replay Dataset*, *Real VS Fake*) to bypass institutional EULA gatekeeping.
+**Consequence:** Allows offline, reproducible evaluation that satisfies ISO/IEC 30107-3 reporting standards without copyright or institutional access hurdles.
+

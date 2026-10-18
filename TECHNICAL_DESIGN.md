@@ -1,17 +1,19 @@
 # Technical Design Document
 ## MOSIP Face Liveness Detection + PAD System
-### Version 0.3.0-M3 | October 2026
+### Version 0.5.0-M5 | October 2026
 
 ---
 
 ## 1. Executive Summary
 
-This document describes the technical design of the face liveness detection and presentation attack detection (PAD) system for the MOSIP Registration Client. The system prevents spoofing attacks during face biometric capture using a multi-layered pipeline: passive PAD scoring, active challenge-response, capture integrity checks, and cryptographic attestation.
+This document describes the technical design of the face liveness detection and presentation attack detection (PAD) system for the MOSIP Registration Client. The system prevents spoofing attacks during face biometric capture using a multi-layered pipeline: passive PAD scoring, active challenge-response, capture integrity checks, ISO/IEC 30107-3 evaluation harness, and cryptographic attestation.
 
 **Key metrics:**
-- 61 source files, 17 test files, 7,318 lines of Java
-- 181 automated tests, 100% pass rate
+- 71 source files, 25 test classes
+- 231 automated tests, 100% pass rate
 - 13-state machine with table-driven transitions
+- Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized)
+- ISO/IEC 30107-3 compliant evaluation harness with Wilson 95% CIs and Monk scale fairness analysis
 - ECDSA P-256 signed attestation
 - Hash-chained audit log
 - 3 deployment workflows + infant variant
@@ -73,6 +75,7 @@ This document describes the technical design of the face liveness detection and 
 | `liveness.service` | Service-layer orchestrator | `LivenessService`, `LivenessServiceConfig`, `ConfigSyncManager` |
 | `liveness.ui` | UI event contract + i18n | `UiEvent`, `UiMessages`, `LivenessUiListener` |
 | `liveness.util` | Utilities | `Sha256` |
+| `liveness.evaluation` | ISO/IEC 30107-3 Evaluation | `EvaluationHarness`, `PadMetrics`, `FairnessAnalyzer`, `ManifestLoader`, `EvaluationReport`, `IadMetrics`, `WilsonConfidenceInterval` |
 | `liveness.score` | Score types | Score abstractions |
 | `liveness.config` | Config types | Config abstractions |
 
@@ -263,7 +266,7 @@ Messages keyed by state name, loaded from `UiMessages`.
 
 ## 11. Test Coverage
 
-### 11.1 Test Suite Summary (181 tests)
+### 11.1 Test Suite Summary (231 tests, 25 test classes)
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
@@ -281,8 +284,17 @@ Messages keyed by state name, loaded from `UiMessages`.
 | Landmark detector | 5 | EAR, MAR, turn detection |
 | Pose gate | 4 | Raw unit evaluation |
 | Policy/config | 24 | Band table, challenge profiles, config bounds |
+| Model qualification | 3 | MiniFASNet ONNX dimensions ([1,3,128,128]), size budgets, output logits |
 | Attack taxonomy | 2 | Species enumeration |
+| Manifest loader & parsing | 8 | Standard & extended demographic CSV formats, comments, malformed rows |
+| Wilson confidence intervals | 8 | 95% Wilson binomial score intervals, edge boundary handling |
+| PAD metrics computation | 9 | Per-species APCER, BPCER, DET curve, D-EER calculation |
+| Fairness & bias analysis | 6 | DFIC Bias Index, Monk Skin Tone (MST 10), Rule of 30 exploratory flags |
+| Evaluation report contract | 10 | ISO/IEC 30107-3 reporting rules, per-species rows, zero ACER, IAD separation |
+| Evaluation harness lifecycle | 5 | Split filtering, threshold evaluation, Rule of 30 enforcement |
+| Benchmark runner E2E | 1 | Full end-to-end evaluation run against ONOT benchmark manifest |
 | **Integration (E2E)** | **16** | **All workflows, attacks, device errors, callbacks** |
+| **Total** | **231** | **25 test classes, 100% pass rate** |
 
 ### 11.2 Integration Test Scenarios
 
@@ -306,30 +318,24 @@ Messages keyed by state name, loaded from `UiMessages`.
 
 ---
 
-## 12. Limitations & Known Gaps
+## 12. Implementation Status & Limitations
 
-### 12.1 Current Limitations
+### 12.1 Completed Milestones & Components
+- **M1 Core Skeleton:** 13-state machine, table-driven transitions, 4-band routing, audit log, ECDSA attestation.
+- **M2 Engine Depth:** Landmark detectors (EAR, MAR, yaw), capture integrity (pHash sequence monitor, freshness, nonce binding), quality gate.
+- **M3 Desktop Integration:** MDS device adapters (STREAM, RCAPTURE, DISCOVERY), service layer, bounded async inference queue.
+- **M5 Evaluation Framework:** ISO/IEC 30107-3 compliant evaluation harness (`liveness.evaluation`), Wilson 95% CIs, worst-species headline APCER, BPCER with Rule of 30 validation ($N=99 \ge 30$), CEN/TS 18099 IAD metrics table, and Monk scale fairness analyzer.
+- **PAD Model Integration:** Shipped and qualified `MiniFASNetV2-SE` (FP32 1.82MB and INT8 612KB) via ONNX Runtime (`1.16.3`), with 128x128 RGB inputs verified empirically via `ModelQualificationTest`.
+- **Datasets:** Unpacked ONOT synthetic ICAO dataset (179 subjects, 5,811 images) and generated subject-disjoint manifests.
 
-| Area | Limitation | Mitigation Plan |
-|------|-----------|-----------------|
-| PAD model | Running in stub mode (configurable score) | Pending ONNX model download from `facenox/face-antispoof-onnx` |
-| Same-face | Stub mode (always returns configured result) | Pending SFace ONNX model |
-| Face detection | No real-time face detection | Pending YuNet ONNX model |
-| Landmarks | Stub landmark data | Real landmarks from face detector |
-| pHash | Not computing real perceptual hashes | Needs pixel-level implementation |
-| JavaFX UI | Event schema ready, UI controls deferred | Requires JavaFX runtime |
-| Android | Not started | Requires Android SDK, CameraX |
-| Evaluation | Blocked | Requires datasets |
+### 12.2 Remaining Gaps / Future Work
 
-### 12.2 Uncalibrated Values
-
-The following thresholds use placeholder values pending calibration with real data:
-- `attackThreshold` (30) — needs CelebA-Spoof calibration
-- `passThreshold` (70) — needs CelebA-Spoof calibration
-- Quality gate blur variance (100.0) — needs calibration
-- EAR blink threshold (0.2) — needs landmark calibration
-- MAR smile threshold (0.6) — needs landmark calibration
-- Same-face cosine distance threshold (0.6) — needs LFW calibration
+| Area | Current Status | Notes |
+|------|---------------|-------|
+| Same-face | Stub mode with configurable cosine distance | OpenCV Zoo SFace embedder integration |
+| Face detection | Landmark detector stub | OpenCV Zoo YuNet integration |
+| Android | Architecture defined (§18.6) | CameraX + Flutter platform channel implementation |
+| JavaFX UI | Event schema (`ui-contract`) defined | GUI widget bindings |
 
 ---
 
@@ -337,20 +343,25 @@ The following thresholds use placeholder values pending calibration with real da
 
 | Dependency | Version | Licence | Purpose |
 |-----------|---------|---------|---------|
-| Java SE | 11 | Oracle/OpenJDK | Runtime |
-| JUnit 5 | 5.9.3 | EPL-2.0 | Testing |
-| ONNX Runtime | (pending) | MIT | PAD model inference |
+| Java SE | 11 | Oracle/OpenJDK | Runtime (`--release 11`) |
+| JUnit 5 | 5.9.3 | EPL-2.0 | Testing (JUnit Jupiter + Params) |
+| ONNX Runtime | 1.16.3 | MIT | Native PAD model inference (`com.microsoft.onnxruntime`) |
 
 ---
 
-## 14. Honest Coverage Statement
+## 14. Honest Coverage Statement (§15.5)
 
-This system implements the complete liveness detection architecture specified in the MASTER_PLAN (§1-§26). The following items are **not yet implemented** and require external dependencies:
-1. Real ONNX model inference (needs model file)
-2. Real face detection and landmark extraction (needs YuNet/SFace models)
-3. Real perceptual hash computation (needs pixel-level pHash)
-4. Android deployment (needs Android SDK)
-5. ISO 30107-3 evaluation (needs datasets)
-6. JavaFX UI controls (needs JavaFX runtime)
+| Threat | Treatment | What We Claim |
+|---|---|---|
+| Printed photo (flat) | **Primary target** | Targeted detection with APCER measured across artefact intensities |
+| Screen display (static/video) | **Primary target** | Targeted detection |
+| Video replay | **Primary target** | Targeted detection |
+| Cut-out mask | **Secondary target** | Increased resistance; detection under favourable conditions |
+| Curved print | **Secondary target** | Increased resistance; detection under favourable conditions |
+| 2D rigid mask | **Secondary target** | Increased resistance; detection under favourable conditions |
+| 3D silicone/resin mask | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
+| Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
+| Injection attacks | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
+| Frozen frame | **Detection** | High-reliability via frame sequence monitor |
+| Frame loop replay | **Detection** | Reliable for non-adaptive replay |
 
-All stubs are explicitly marked and return configurable values for testing.
