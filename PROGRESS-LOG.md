@@ -224,14 +224,16 @@
 
 ---
 
-## Milestone 6 — Documentation 🔧
-**Status: IN PROGRESS / UPDATED**
-- `docs/TEST_REPORT.md`: Updated to v0.5.0-M5 with full benchmark results, per-species APCER, Wilson CIs, IAD metrics, and Monk scale fairness.
-- `docs/TECHNICAL_DESIGN.md`: Updated to v0.5.0-M5 with evaluation harness architecture, test breakdown, and honest coverage statement.
-- `docs/INTEGRATION_GUIDE.md`: Updated to v0.5.0-M5 with quick start, MDS adapters, and benchmark harness runner instructions.
-- `docs/decisions.md`: Added ADR-008 (Dataset & PAD Model Selection for Evaluation).
+## Milestone 6 — Documentation ✅
+**Status: COMPLETE** | Completed: 2026-10-19
+- `docs/TEST_REPORT.md`: Updated to v0.6.0 with full benchmark results (338 tests, 37 test classes), per-species APCER, Wilson CIs, IAD metrics, and Monk scale fairness.
+- `docs/TECHNICAL_DESIGN.md`: Updated to v0.6.0 with evaluation harness architecture, test breakdown, ADR-009 reference, and honest coverage statement.
+- `docs/INTEGRATION_GUIDE.md`: Updated to v0.6.0 with quick start, MDS adapters, Android CameraX/SBI setup, and benchmark harness runner instructions.
+- `docs/DEMO_SCRIPT.md`: Comprehensive step-by-step evaluator and judge demonstration walkthrough.
+- `docs/UX_GUIDE.md`: Multi-modal UI/UX specifications covering the 3 screens, 8 states, EN/FR/AR i18n, and inclusive accessibility profiles.
+- `docs/decisions.md`: Added ADR-008 (Dataset & PAD Model Selection) and ADR-009 (Android M4 Constraints & Architecture).
 - `docs/licence-register.md`: Recorded SHA-256 for MiniFASNet models and updated dataset license metadata.
-- `docs/PROGRESS-LOG.md`: Updated with full M5 completion and M6 progress.
+- `docs/PROGRESS-LOG.md`: Fully synced and closed out across all milestones M1 through M6.
 
 ---
 
@@ -300,5 +302,10 @@ All third-party components must be documented before shipping. See `docs/licence
 | 2026-10-19 | Recorded model SHA-256 hashes in `docs/licence-register.md` | Agent |
 | 2026-10-19 | Executed benchmark evaluation harness and generated `docs/TEST_REPORT.md` (ISO/IEC 30107-3 compliant, worst-species APCER, BPCER, DET, IAD, Monk scale fairness) | Agent |
 | 2026-10-19 | **M5 GATE PASSED: 231 tests, 0 failures** | Agent |
+| 2026-10-19 | **M4 Android Core Integrated:** CameraX adapter, SBI intent bridge, CrossStreamBinder, EnvironmentIntegrityChecker, Flutter plugin/UI (102 new tests, 333 tests passing) | Agent |
+| 2026-10-19 | **Operational Blockers Resolved:** INT8 latency benchmark test (mean 7.19 ms, p95 7.80 ms <= 200 ms), ReferenceFaceEmbedder (128-D), fail-closed JP2 decoding, PEM trust anchors (`SbiJwtVerifier.fromPem`) | Agent |
+| 2026-10-19 | Added ADR-009 for Android M4 Deployment Constraints and Fallback Architecture | Agent |
+| 2026-10-19 | Fixed MockDeviceAdapter pHash false-positive freeze detection via SplitMix64 | Agent |
+| 2026-10-19 | **M6 GATE PASSED: 338 tests passing across 37 test classes, 0 failures, DEMO_SCRIPT.md & UX_GUIDE.md added** | Agent |
 
 

@@ -1,6 +1,6 @@
 # Integration Guide
 ## MOSIP Face Liveness Detection + PAD
-### Version 0.5.0-M5
+### Version 0.6.0
 
 ---
 
@@ -20,7 +20,7 @@ This guide explains how to integrate the face liveness detection system into the
 
 ```bash
 mvn clean package -DskipTests
-# Output: target/face-liveness-pad-0.3.0-M3.jar (or newer)
+# Output: target/face-liveness-pad-0.6.0.jar (or newer)
 ```
 
 ---
@@ -273,7 +273,7 @@ Supported locales: `en` (default), `fr`, `ar`
 
 ### 11.1 Full Test Suite
 
-Run all 333 unit and integration tests:
+Run all 338 unit and integration tests:
 
 ```bash
 mvn clean test
@@ -329,6 +329,20 @@ All Android business logic runs on a standard JVM without requiring an emulator:
 
 ```bash
 mvn test -Dtest='liveness.android.*Test'
+```
+
+### 12.4 Mobile INT8 Latency Benchmark & Trust Anchor Verification
+To benchmark the quantized INT8 mobile ONNX model latency ($p95 \le 200\text{ ms}$):
+
+```bash
+mvn test -Dtest=Int8ModelBenchmarkTest
+```
+
+To ingest production MOSIP Device Provider root CAs into the SBI JWT verification chain:
+
+```java
+String pemCertificate = "...PEM DATA...";
+SbiJwtVerifier verifier = SbiJwtVerifier.fromPem(pemCertificate);
 ```
 
 

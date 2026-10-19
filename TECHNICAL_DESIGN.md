@@ -1,6 +1,6 @@
 # Technical Design Document
 ## MOSIP Face Liveness Detection + PAD System
-### Version 0.6.0-M4/M5 | October 2026
+### Version 0.6.0 | October 2026
 
 ---
 
@@ -9,10 +9,10 @@
 This document describes the technical design of the face liveness detection and presentation attack detection (PAD) system for the MOSIP Registration Client. The system prevents spoofing attacks during face biometric capture using a multi-layered pipeline: passive PAD scoring, active challenge-response, capture integrity checks, ISO/IEC 30107-3 evaluation harness, and cryptographic attestation.
 
 **Key metrics:**
-- 92 source files, 36 test classes
-- 333 automated tests, 100% pass rate
+- 94 source files, 37 test classes
+- 338 automated tests, 100% pass rate
 - 13-state machine with table-driven transitions
-- Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized)
+- Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized: mean 7.19 ms, p95 7.80 ms)
 - ISO/IEC 30107-3 compliant evaluation harness with Wilson 95% CIs and Monk scale fairness analysis
 - Android CameraX + MOSIP SBI Intent bridge + Flutter UI platform channel
 - ECDSA P-256 signed attestation
@@ -340,7 +340,9 @@ Messages keyed by state name, loaded from `UiMessages`.
 - **M2 Engine Depth:** Landmark detectors (EAR, MAR, yaw), capture integrity (pHash sequence monitor, freshness, nonce binding), quality gate.
 - **M3 Desktop Integration:** MDS device adapters (STREAM, RCAPTURE, DISCOVERY), service layer, bounded async inference queue.
 - **M4 Android Implementation:** CameraX adapter (`CameraXDeviceAdapter`), MOSIP SBI intent bridge (`SbiIntentBridge`, `SbiIntentDeviceAdapter`), cross-stream binder (`CrossStreamBinder`), environment integrity checker (`EnvironmentIntegrityChecker`), Flutter platform channel (`LivenessPlatformChannel`), ISO 19794-5 record parser, and Flutter UI package (`flutter/liveness_ui`).
+- **M4 Operational Verification (ADR-009):** INT8 ONNX latency benchmark (`Int8ModelBenchmarkTest`: mean 7.19 ms, p95 7.80 ms), built-in 128-D spatial embedder (`ReferenceFaceEmbedder`), safe fail-closed JPEG 2000 decoder (`IsoFaceRgbDecoder`), and PEM certificate trust anchor ingestion (`SbiJwtVerifier.fromPem`).
 - **M5 Evaluation Framework:** ISO/IEC 30107-3 compliant evaluation harness (`liveness.evaluation`), Wilson 95% CIs, worst-species headline APCER, BPCER with Rule of 30 validation ($N=99 \ge 30$), CEN/TS 18099 IAD metrics table, and Monk scale fairness analyzer.
+- **M6 Documentation & Evaluator Tools:** Final technical design, multi-modal UI/UX guide (`UX_GUIDE.md`), evaluator walkthrough (`DEMO_SCRIPT.md`), ISO/IEC 30107-3 test report (`TEST_REPORT.md`), and decisions register (`decisions.md` ADR-001 to ADR-009).
 - **PAD Model Integration:** Shipped and qualified `MiniFASNetV2-SE` (FP32 1.82MB and INT8 612KB) via ONNX Runtime (`1.16.3`), with 128x128 RGB inputs verified empirically via `ModelQualificationTest`.
 - **Datasets:** Unpacked ONOT synthetic ICAO dataset (179 subjects, 5,811 images) and generated subject-disjoint manifests.
 
@@ -348,9 +350,9 @@ Messages keyed by state name, loaded from `UiMessages`.
 
 | Area | Current Status | Notes |
 |------|---------------|-------|
-| Same-face | Stub mode with configurable cosine distance | OpenCV Zoo SFace embedder integration |
-| Face detection | Landmark detector stub | OpenCV Zoo YuNet integration |
-| JavaFX UI | Event schema (`ui-contract`) defined | Desktop GUI widget bindings |
+| Same-face | Reference 128-D spatial embedder active | Deep neural model (OpenCV Zoo SFace / ArcFace) pluggable via `FaceEmbedder` interface with calibrated 0.60 threshold |
+| Face detection | Landmark detector with pose gate active | OpenCV Zoo YuNet integration |
+| JavaFX UI | Event schema (`ui-contract`) defined | Desktop GUI widget bindings (Flutter mobile UI complete) |
 
 ---
 
