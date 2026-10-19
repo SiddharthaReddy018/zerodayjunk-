@@ -69,3 +69,16 @@
 3. **Attack Evaluation:** Sourced replay attack video fixtures and Kaggle open alternatives (*Antispoofing Replay Dataset*, *Real VS Fake*) to bypass institutional EULA gatekeeping.
 **Consequence:** Allows offline, reproducible evaluation that satisfies ISO/IEC 30107-3 reporting standards without copyright or institutional access hurdles.
 
+## ADR-009: Android M4 Deployment Constraints and Fallback Architecture
+
+**Date:** 2026-10-19  
+**Status:** DECIDED (§18.6, §21, §26.9)  
+**Context:** Android integration involves cross-stream binding between host CameraX frames (T3) and SBI `rCapture` intents (T1). Field deployments face mobile hardware latency limits, lack of native JPEG 2000 support, external face recognition model availability, and device-provider trust chains.  
+**Decision:**
+1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets. Empirically verified via native ONNX Runtime in `Int8ModelBenchmarkTest` (300 iterations: mean 8.15 ms, p50 8.00 ms, p95 9.45 ms), achieving >20x latency headroom for low-end devices.
+2. **Same-Face Consistency:** Provided `ReferenceFaceEmbedder` (128-D normalized spatial descriptor) for out-of-the-box cross-stream verification without external dependencies. Deep neural models (OpenCV Zoo SFace / ArcFace) plug into `FaceEmbedder` with a calibrated threshold of 0.60 cosine distance.
+3. **JPEG 2000 Safe Fail-Closed:** Handled ISO/IEC 19794-5 JPEG frames natively via Android `BitmapFactory`. For JPEG 2000, provided the `IsoFaceRgbDecoder.Jpeg2000Decoder` interface for optional OpenJPEG JNI injection; without one, the parser fails closed safely (`Result.EMBEDDING_FAILED`), preventing unverified image substitution.
+4. **JWT Trust Anchors:** Added `SbiJwtVerifier.fromPem()` to allow dynamic loading of MOSIP Device Provider root CAs from PEM assets.
+**Consequence:** Guarantees deterministic, offline-capable, and secure Android liveness capture while maintaining strict fail-closed security invariants.
+
+
