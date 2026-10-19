@@ -157,10 +157,38 @@
 
 ---
 
-## Milestone 4 — Android ⏳
-**Status: ARCHITECTURE DEFINED / IMPLEMENTATION DEFERRED**
-- Platform channel contract defined in `ui-contract/events-schema.json`.
-- CameraX + Flutter host integration design specified in `TECHNICAL_DESIGN.md` §12.2.
+## Milestone 4 — Android ✅
+**Status: COMPLETE** | Completed: 2026-10-19
+**Gate: CameraX adapter, SBI intent bridge, CrossStreamBinder, EnvironmentIntegrityChecker, Flutter platform channel & UI, 102 new unit/integration tests (333 total tests passing)**
+
+### Components Built (Package `liveness.android` & Glue Modules)
+| # | Component | Location | Status | Notes |
+|---|-----------|----------|--------|-------|
+| 1 | `CameraXDeviceAdapter.java` | `liveness.android` | ✅ | T3 host camera adapter: YUV->RGB, luma variance, pHash, non-blocking queue |
+| 2 | `SbiIntentBridge.java` / `SbiIntentDeviceAdapter.java` | `liveness.android` | ✅ | MOSIP SBI intent launcher & response parser (`io.sbi.device`, `.Info`, `.rCapture`) |
+| 3 | `CrossStreamBinder.java` | `liveness.android` | ✅ | Binds CameraX preview to SBI rCapture via nonce + time gap + `SameFaceChecker` |
+| 4 | `EnvironmentIntegrityChecker.java` | `liveness.android` | ✅ | Detects root, su binaries, ADB debugging, Xposed/Frida hooks, and emulators |
+| 5 | `SbiJwtVerifier.java` | `liveness.android` | ✅ | JWS signature validation for SBI capture tokens with MOSIP trust cert |
+| 6 | `Iso19794Face.java` / `IsoFaceRgbDecoder.java` | `liveness.android` | ✅ | ISO/IEC 19794-5 face record parser extracting facial images and metadata |
+| 7 | `LivenessPlatformChannel.java` | `liveness.android` | ✅ | MethodChannel + EventChannel adhering to `ui-contract/events-schema.json` |
+| 8 | `AndroidDeviceAdapter.java` | `liveness.android` | ✅ | Composite adapter: integrity check -> CameraX preview -> SBI rCapture |
+| 9 | `LatencyBenchmark.java` | `liveness.android` | ✅ | Lightweight latency tracking for mobile inference |
+| 10 | Android Glue Module | `android/liveness-android/` | ✅ | Gradle library, `CameraXAnalyzer`, `AndroidSbiLauncher`, `LivenessFlutterPlugin` |
+| 11 | Flutter UI Module | `flutter/liveness_ui/` | ✅ | 3 screens (Resident, Operator, Supervisor) across 8 states, oval guide, challenge animations |
+
+### Test Files Added (9 test classes, 102 new tests)
+| # | Test Class | Package | Tests | Notes |
+|---|-----------|---------|-------|-------|
+| 1 | `SbiIntentBridgeTest.java` | `android` | 29 | Intent creation, response parsing, timeout handling, error mapping |
+| 2 | `LivenessPlatformChannelTest.java` | `android` | 16 | Platform channel schema validation against `events-schema.json` |
+| 3 | `EnvironmentIntegrityCheckerTest.java` | `android` | 14 | Root detection, ADB debugging, hook detection |
+| 4 | `CameraXDeviceAdapterTest.java` | `android` | 13 | Frame queue management, drop-oldest, YUV conversion |
+| 5 | `SbiJwtVerifierTest.java` | `android` | 10 | JWT signature verification, payload extraction, tampering detection |
+| 6 | `Iso19794FaceTest.java` | `android` | 6 | ISO/IEC 19794-5 record parsing and face extraction |
+| 7 | `AndroidPipelineIntegrationTest.java` | `android` | 5 | End-to-end simulated Android session with CameraX + SBI capture |
+| 8 | `LatencyBenchmarkTest.java` | `android` | 5 | Benchmarking execution times and percentiles |
+| 9 | `MockDevicePerceptualHashTest.java` | `device` | 4 | SplitMix64 perceptual hashing for mock device frames |
+
 
 ---
 

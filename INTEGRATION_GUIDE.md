@@ -273,7 +273,7 @@ Supported locales: `en` (default), `fr`, `ar`
 
 ### 11.1 Full Test Suite
 
-Run all 231 unit and integration tests:
+Run all 333 unit and integration tests:
 
 ```bash
 mvn clean test
@@ -306,4 +306,29 @@ To verify ONNX model input dimensions, channel ordering (`[1, 3, 128, 128]` RGB)
 ```bash
 mvn test -Dtest=ModelQualificationTest
 ```
+
+---
+
+## 12. Android & Flutter Mobile Integration (Milestone 4)
+
+See [`README-M4.md`](file:///Users/k.siddharthareddy/Documents/MOSIP/face-liveness-pad/README-M4.md) for full setup instructions.
+
+### 12.1 Architecture
+- **Liveness Frames:** Host CameraX analysis frames (Tier T3).
+- **Accepted Biometric Capture:** MOSIP SBI intent `io.sbi.device.rCapture` (Tier T1).
+- **Binding:** `CrossStreamBinder` binds CameraX frames to the SBI image via nonce matching + maximum time gap + same-face check.
+- **Environment Integrity:** `EnvironmentIntegrityChecker` verifies against root, ADB debugging, Xposed/Frida hooking, and emulators before opening the camera.
+
+### 12.2 Gradle & Android Modules
+- **Android Library:** `android/liveness-android/` (minSdk 28, targetSdk 31, Java 11).
+- **ONNX Runtime:** `com.microsoft.onnxruntime:onnxruntime-android:1.16.3`.
+- **Flutter UI Plugin:** `flutter/liveness_ui/` provides resident, operator, and supervisor capture screens reacting to `ui-contract/events-schema.json`.
+
+### 12.3 Running Android Unit Tests
+All Android business logic runs on a standard JVM without requiring an emulator:
+
+```bash
+mvn test -Dtest='liveness.android.*Test'
+```
+
 

@@ -1,6 +1,6 @@
 # Technical Design Document
 ## MOSIP Face Liveness Detection + PAD System
-### Version 0.5.0-M5 | October 2026
+### Version 0.6.0-M4/M5 | October 2026
 
 ---
 
@@ -9,11 +9,12 @@
 This document describes the technical design of the face liveness detection and presentation attack detection (PAD) system for the MOSIP Registration Client. The system prevents spoofing attacks during face biometric capture using a multi-layered pipeline: passive PAD scoring, active challenge-response, capture integrity checks, ISO/IEC 30107-3 evaluation harness, and cryptographic attestation.
 
 **Key metrics:**
-- 71 source files, 25 test classes
-- 231 automated tests, 100% pass rate
+- 92 source files, 36 test classes
+- 333 automated tests, 100% pass rate
 - 13-state machine with table-driven transitions
 - Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized)
 - ISO/IEC 30107-3 compliant evaluation harness with Wilson 95% CIs and Monk scale fairness analysis
+- Android CameraX + MOSIP SBI Intent bridge + Flutter UI platform channel
 - ECDSA P-256 signed attestation
 - Hash-chained audit log
 - 3 deployment workflows + infant variant
@@ -26,8 +27,9 @@ This document describes the technical design of the face liveness detection and 
 
 ```
 ┌────────────────────────────────────────────────────────┐
-│                    UI Layer (JavaFX)                     │
+│             UI Layer (JavaFX / Flutter)                │
 │   LivenessUiListener ← UiEvent ← UiMessages (i18n)    │
+│   Flutter MethodChannel / EventChannel                 │
 └────────────────────┬───────────────────────────────────┘
                      │ LivenessCallback
 ┌────────────────────▼───────────────────────────────────┐
@@ -47,24 +49,28 @@ This document describes the technical design of the face liveness detection and 
 │              Capture Integrity Layer                     │
 │   FrameSequenceMonitor · DeviceIdentityValidator        │
 │   FreshnessChecker · SessionTransactionBinder           │
-│   CaptureIntegrityChecker                               │
+│   CaptureIntegrityChecker · EnvironmentIntegrityChecker │
 └────────────────────┬───────────────────────────────────┘
                      │
 ┌────────────────────▼───────────────────────────────────┐
 │                  Device Layer                            │
 │   DeviceAdapter (interface)                             │
-│   ├── MdsHttpDeviceAdapter (MOSIP SBI)                  │
+│   ├── MdsHttpDeviceAdapter (MOSIP Desktop SBI)          │
+│   ├── AndroidDeviceAdapter (CameraX T3 + SBI T1)        │
+│   ├── CameraXDeviceAdapter (T3 Host Camera Analysis)    │
+│   ├── SbiIntentDeviceAdapter (T1 MOSIP Mobile SBI)      │
 │   ├── MockDeviceAdapter (20 scenarios)                  │
 │   MdsStreamReader · MdsDeviceInfo · MdsResponse         │
 └─────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Package Structure (14 packages, 61 source files)
+### 2.2 Package Structure (15 packages, 92 source files)
 
 | Package | Purpose | Key Classes |
 |---------|---------|-------------|
 | `liveness.core` | Immutable value types | `FaceFrame`, `FrameQuality` |
 | `liveness.device` | Device abstraction + MDS | `DeviceAdapter`, `MdsHttpDeviceAdapter`, `MockDeviceAdapter` |
+| `liveness.android` | Android CameraX + SBI + Flutter | `CameraXDeviceAdapter`, `SbiIntentBridge`, `CrossStreamBinder`, `EnvironmentIntegrityChecker`, `LivenessPlatformChannel`, `Iso19794Face` |
 | `liveness.capture` | Capture integrity (IAD) | `CaptureIntegrityChecker`, `FrameSequenceMonitor`, `FreshnessChecker` |
 | `liveness.engine` | Scoring + detection | `MiniFasNetScorer`, `DecisionEngine`, `QualityGate`, `SameFaceChecker` |
 | `liveness.challenge` | Active challenge system | `ChallengeGenerator`, `ChallengeResponseValidator`, `BoundChallenge` |
@@ -266,7 +272,7 @@ Messages keyed by state name, loaded from `UiMessages`.
 
 ## 11. Test Coverage
 
-### 11.1 Test Suite Summary (231 tests, 25 test classes)
+### 11.1 Test Suite Summary (333 tests, 36 test classes)
 
 | Category | Tests | Coverage |
 |----------|-------|----------|
@@ -293,8 +299,17 @@ Messages keyed by state name, loaded from `UiMessages`.
 | Evaluation report contract | 10 | ISO/IEC 30107-3 reporting rules, per-species rows, zero ACER, IAD separation |
 | Evaluation harness lifecycle | 5 | Split filtering, threshold evaluation, Rule of 30 enforcement |
 | Benchmark runner E2E | 1 | Full end-to-end evaluation run against ONOT benchmark manifest |
-| **Integration (E2E)** | **16** | **All workflows, attacks, device errors, callbacks** |
-| **Total** | **231** | **25 test classes, 100% pass rate** |
+| **Android SBI Intent Bridge** | **29** | **Intent creation, response parsing, timeouts, error mapping** |
+| **Android Platform Channel** | **16** | **MethodChannel/EventChannel contract against `events-schema.json`** |
+| **Environment Integrity** | **14** | **Root, ADB debugging, su binaries, hook detection** |
+| **CameraX Device Adapter** | **13** | **Frame queue drop-oldest, YUV conversion, thread safety** |
+| **SBI JWT Verifier** | **10** | **JWS signature verification and tampering detection** |
+| **ISO/IEC 19794-5 Face Parser** | **6** | **Record structure and face data parsing** |
+| **Android Pipeline Integration**| **5** | **Full end-to-end simulated session (CameraX + SBI rCapture)** |
+| **Latency Benchmark** | **5** | **Execution timing percentiles on mobile workloads** |
+| **Mock Perceptual Hash** | **4** | **SplitMix64 perceptual hashing on mock frames** |
+| **Integration (E2E Desktop)** | **16** | **All workflows, attacks, device errors, callbacks** |
+| **Total** | **333** | **36 test classes, 100% pass rate** |
 
 ### 11.2 Integration Test Scenarios
 
@@ -324,6 +339,7 @@ Messages keyed by state name, loaded from `UiMessages`.
 - **M1 Core Skeleton:** 13-state machine, table-driven transitions, 4-band routing, audit log, ECDSA attestation.
 - **M2 Engine Depth:** Landmark detectors (EAR, MAR, yaw), capture integrity (pHash sequence monitor, freshness, nonce binding), quality gate.
 - **M3 Desktop Integration:** MDS device adapters (STREAM, RCAPTURE, DISCOVERY), service layer, bounded async inference queue.
+- **M4 Android Implementation:** CameraX adapter (`CameraXDeviceAdapter`), MOSIP SBI intent bridge (`SbiIntentBridge`, `SbiIntentDeviceAdapter`), cross-stream binder (`CrossStreamBinder`), environment integrity checker (`EnvironmentIntegrityChecker`), Flutter platform channel (`LivenessPlatformChannel`), ISO 19794-5 record parser, and Flutter UI package (`flutter/liveness_ui`).
 - **M5 Evaluation Framework:** ISO/IEC 30107-3 compliant evaluation harness (`liveness.evaluation`), Wilson 95% CIs, worst-species headline APCER, BPCER with Rule of 30 validation ($N=99 \ge 30$), CEN/TS 18099 IAD metrics table, and Monk scale fairness analyzer.
 - **PAD Model Integration:** Shipped and qualified `MiniFASNetV2-SE` (FP32 1.82MB and INT8 612KB) via ONNX Runtime (`1.16.3`), with 128x128 RGB inputs verified empirically via `ModelQualificationTest`.
 - **Datasets:** Unpacked ONOT synthetic ICAO dataset (179 subjects, 5,811 images) and generated subject-disjoint manifests.
@@ -334,8 +350,7 @@ Messages keyed by state name, loaded from `UiMessages`.
 |------|---------------|-------|
 | Same-face | Stub mode with configurable cosine distance | OpenCV Zoo SFace embedder integration |
 | Face detection | Landmark detector stub | OpenCV Zoo YuNet integration |
-| Android | Architecture defined (§18.6) | CameraX + Flutter platform channel implementation |
-| JavaFX UI | Event schema (`ui-contract`) defined | GUI widget bindings |
+| JavaFX UI | Event schema (`ui-contract`) defined | Desktop GUI widget bindings |
 
 ---
 

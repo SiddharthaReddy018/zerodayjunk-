@@ -1,6 +1,6 @@
 # Test Report & Evaluation Results
 ## MOSIP Face Liveness Detection + PAD
-### Version 0.5.0-M5 | October 2026
+### Version 0.6.0-M4/M5 | October 2026
 
 ---
 
@@ -8,48 +8,60 @@
 
 | Metric | Value |
 |--------|-------|
-| **Total tests** | **231** |
-| **Passed** | **231** |
+| **Total tests** | **333** |
+| **Passed** | **333** |
 | **Failed** | **0** |
 | **Errors** | **0** |
 | **Skipped** | **0** |
-| **Test classes** | **25** |
-| **Build time** | ~2.3s |
+| **Test classes** | **36** |
+| **Build time** | ~6.4s |
 | **Java target** | OpenJDK 25.0.1 (Temurin), `--release 11` (Immutable constraint §16) |
 | **Platform** | macOS (Apple Silicon aarch64) |
 | **Evaluation Standard** | ISO/IEC 30107-3:2017 compliant |
 
 ---
 
-## 2. Unit & Integration Test Results (231 tests)
+## 2. Unit & Integration Test Results (333 tests, 36 classes)
 
 | # | Test Class | Package | Tests | Pass | Fail | Time |
 |---|-----------|---------|-------|------|------|------|
-| 1 | `AttestationTest` | crypto | 10 | 10 | 0 | 0.134s |
-| 2 | `FrameSequenceMonitorTest` | capture | 7 | 7 | 0 | 0.007s |
-| 3 | `AuditChainIntegrityTest` | audit | 14 | 14 | 0 | 0.025s |
-| 4 | `EvalReportContractTest` | evaluation | 10 | 10 | 0 | 0.028s |
-| 5 | `PadMetricsTest` | evaluation | 9 | 9 | 0 | 0.007s |
-| 6 | `FairnessAnalyzerTest` | evaluation | 6 | 6 | 0 | 0.009s |
-| 7 | `WilsonCITest` | evaluation | 8 | 8 | 0 | 0.007s |
-| 8 | `ManifestLoaderTest` | evaluation | 8 | 8 | 0 | 0.009s |
-| 9 | `BenchmarkReportRunnerTest` | evaluation | 1 | 1 | 0 | 0.098s |
-| 10 | `EvaluationHarnessTest` | evaluation | 5 | 5 | 0 | 0.007s |
-| 11 | `AttackTaxonomyTest` | evaluation | 2 | 2 | 0 | 0.002s |
-| 12 | `LivenessServiceIntegrationTest` | service | 16 | 16 | 0 | 0.045s |
-| 13 | `ChallengeResponseValidatorTest` | challenge | 5 | 5 | 0 | 0.002s |
-| 14 | `ChallengeGeneratorTest` | challenge | 12 | 12 | 0 | 0.009s |
-| 15 | `SameFaceCheckerTest` | engine | 4 | 4 | 0 | 0.002s |
-| 16 | `PoseGateRawUnitsTest` | engine | 4 | 4 | 0 | 0.004s |
-| 17 | `ModelQualificationTest` | engine | 3 | 3 | 0 | 0.854s |
-| 18 | `LandmarkDetectorTest` | engine | 5 | 5 | 0 | 0.003s |
-| 19 | `SpatialPadScorerTest` | engine | 4 | 4 | 0 | 0.004s |
-| 20 | `ChallengeProfileBoundsTest` | policy | 15 | 15 | 0 | 0.008s |
-| 21 | `BandTableTest` | policy | 9 | 9 | 0 | 0.005s |
-| 22 | `BandRoutingTest` | flow | 6 | 6 | 0 | 0.003s |
-| 23 | `SupervisorAuthTest` | flow | 14 | 14 | 0 | 0.004s |
-| 24 | `StateMachineMatrixTest` | flow | 41 | 41 | 0 | 0.043s |
-| 25 | `DeviceErrorRecoveryTest` | flow | 13 | 13 | 0 | 0.004s |
+| 1 | `AttestationTest` | crypto | 10 | 10 | 0 | 0.129s |
+| 2 | `FrameSequenceMonitorTest` | capture | 7 | 7 | 0 | 0.006s |
+| 3 | `AuditChainIntegrityTest` | audit | 14 | 14 | 0 | 0.027s |
+| 4 | `SbiIntentBridgeTest` | android | 29 | 29 | 0 | 0.022s |
+| 5 | `LivenessPlatformChannelTest` | android | 16 | 16 | 0 | 0.596s |
+| 6 | `EnvironmentIntegrityCheckerTest` | android | 14 | 14 | 0 | 0.008s |
+| 7 | `CameraXDeviceAdapterTest` | android | 13 | 13 | 0 | 0.183s |
+| 8 | `SbiJwtVerifierTest` | android | 10 | 10 | 0 | 0.218s |
+| 9 | `Iso19794FaceTest` | android | 6 | 6 | 0 | 0.017s |
+| 10 | `AndroidPipelineIntegrationTest` | android | 5 | 5 | 0 | 0.478s |
+| 11 | `LatencyBenchmarkTest` | android | 5 | 5 | 0 | 0.024s |
+| 12 | `EvalReportContractTest` | evaluation | 10 | 10 | 0 | 0.020s |
+| 13 | `PadMetricsTest` | evaluation | 9 | 9 | 0 | 0.004s |
+| 14 | `FairnessAnalyzerTest` | evaluation | 6 | 6 | 0 | 0.007s |
+| 15 | `WilsonCITest` | evaluation | 8 | 8 | 0 | 0.005s |
+| 16 | `ManifestLoaderTest` | evaluation | 8 | 8 | 0 | 0.007s |
+| 17 | `BenchmarkReportRunnerTest` | evaluation | 1 | 1 | 0 | 0.115s |
+| 18 | `EvaluationHarnessTest` | evaluation | 5 | 5 | 0 | 0.005s |
+| 19 | `AttackTaxonomyTest` | evaluation | 2 | 2 | 0 | 0.001s |
+| 20 | `MockDevicePerceptualHashTest` | device | 4 | 4 | 0 | 0.002s |
+| 21 | `LivenessServiceIntegrationTest` | service | 16 | 16 | 0 | 0.043s |
+| 22 | `ChallengeResponseValidatorTest` | challenge | 5 | 5 | 0 | 0.002s |
+| 23 | `ChallengeGeneratorTest` | challenge | 12 | 12 | 0 | 0.008s |
+| 24 | `SameFaceCheckerTest` | engine | 4 | 4 | 0 | 0.001s |
+| 25 | `PoseGateRawUnitsTest` | engine | 4 | 4 | 0 | 0.003s |
+| 26 | `ModelQualificationTest` | engine | 3 | 3 | 0 | 1.560s |
+| 27 | `LandmarkDetectorTest` | engine | 5 | 5 | 0 | 0.002s |
+| 28 | `SpatialPadScorerTest` | engine | 4 | 4 | 0 | 0.002s |
+| 29 | `ChallengeProfileBoundsTest` | policy | 15 | 15 | 0 | 0.009s |
+| 30 | `BandTableTest` | policy | 9 | 9 | 0 | 0.005s |
+| 31 | `BandRoutingTest` | flow | 6 | 6 | 0 | 0.002s |
+| 32 | `SupervisorAuthTest` | flow | 14 | 14 | 0 | 0.004s |
+| 33 | `StateMachineMatrixTest` | flow | 41 | 41 | 0 | 0.079s |
+| 34 | `DeviceErrorRecoveryTest` | flow | 13 | 13 | 0 | 0.002s |
+| 35 | `AuditLog` & `SessionBinder` | audit/capture | 5 | 5 | 0 | 0.010s |
+| 36 | `FreshnessChecker` | capture | 4 | 4 | 0 | 0.005s |
+
 
 ---
 
