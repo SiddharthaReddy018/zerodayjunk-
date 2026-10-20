@@ -273,7 +273,7 @@ Supported locales: `en` (default), `fr`, `ar`
 
 ### 11.1 Full Test Suite
 
-Run all 338 unit and integration tests:
+Run all unit and integration tests (expected count: see TEST_REPORT.md generated block):
 
 ```bash
 mvn clean test

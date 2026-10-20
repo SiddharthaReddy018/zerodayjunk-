@@ -10,7 +10,7 @@ This document describes the technical design of the face liveness detection and 
 
 **Key metrics:**
 - 94 source files, 37 test classes
-- 338 automated tests, 100% pass rate
+- automated test suite (count and pass rate: see TEST_REPORT.md generated block)
 - 13-state machine with table-driven transitions
 - Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized: mean 7.19 ms, p95 7.80 ms)
 - ISO/IEC 30107-3 compliant evaluation harness with Wilson 95% CIs and Monk scale fairness analysis
@@ -379,6 +379,6 @@ Messages keyed by state name, loaded from `UiMessages`.
 | 3D silicone/resin mask | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
 | Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
 | Injection attacks | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
-| Frozen frame | **Detection** | High-reliability via frame sequence monitor |
-| Frame loop replay | **Detection** | Reliable for non-adaptive replay |
+| Frozen frame | **Detection** | Detected for identical pHash sequence; unmeasured in offline still benchmark |
+| Frame loop replay | **Detection** | Detected for repeated sequence window; unmeasured in offline still benchmark |
 

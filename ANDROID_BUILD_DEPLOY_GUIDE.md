@@ -52,7 +52,7 @@ adb shell getprop ro.product.cpu.abi         # arm64-v8a expected
 
 ```
 git clone https://github.com/SiddharthaReddy018/zeroday.git && cd zeroday
-mvn -q test                                  # expect 338 tests (README-M4 says 330; docs say 338)
+mvn -q test                                  # expect the count printed by tools/test_report_counts.py (see TEST_REPORT.md generated block)
 mvn -q -Dtest='liveness.android.*Test' test  # Android core only
 ```
 

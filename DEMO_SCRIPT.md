@@ -12,7 +12,7 @@ This guide provides step-by-step instructions for judges, evaluators, and engine
 The system enforces ISO/IEC 30107-3 compliance, CEN/TS 18099 injection attack detection (IAD), and strict fail-closed state machine transitions across Desktop (MDS HTTP) and Mobile (Android CameraX + MOSIP SBI Intent Bridge).
 
 ### Evaluation Highlights
-- **100% Automated Test Coverage:** 338 unit, integration, and contract tests across 37 test classes pass in ~8 seconds.
+- **100% Automated Test Coverage:** automated unit, integration, and contract tests (count: see TEST_REPORT.md generated block) pass in ~8 seconds.
 - **ISO/IEC 30107-3 Evaluation Harness:** Subject-disjoint benchmark with Wilson 95% confidence intervals, zero ACER reporting, and Monk Skin Tone fairness analysis.
 - **Mobile Edge Latency:** Quantized INT8 ONNX model achieves **mean 7.19 ms, p95 7.80 ms** inference time ($>20\times$ faster than the $\le 200\text{ ms}$ mobile target).
 - **Zero Foundation Model Footprint:** Model budget $\le 5\text{ MB}$ (MiniFASNetV2-SE INT8 is 612 KB; FP32 is 1.82 MB), completely offline-capable.
@@ -47,7 +47,7 @@ mvn clean test
 ### Expected Output:
 ```
 [INFO] Results:
-[INFO] Tests run: 338, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: <N from your run>, Failures: 0, Errors: 0, Skipped: <S>
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------

@@ -120,3 +120,15 @@
    - **FAR (False Acceptance Rate):** 4/100 = **4.00%** (95% Wilson CI: [0.0157, 0.0570, 0.0984])
    - **FRR (False Rejection Rate):** 1/50 = **2.00%** (95% Wilson CI: [0.0035, 0.0542, 0.1050])
 **Consequences:** Validates genuine/impostor discrimination with real facial embeddings and Wilson statistical bounds. `SameFaceChecker` correctly rejects impostors (96% rejection rate) and accepts genuine subjects (98% acceptance rate).
+
+## ADR-013: External audit fixes (Oct 20, 2026)
+
+**Status:** DECIDED  
+**Changes:**
+1. Final RCAPTURE image must score CLEAR_BONA_FIDE to commit; UNCERTAIN or lower goes to RETRY_AVAILABLE via row 19 (event SAME_FACE_FAIL, audit reason FINAL_PAD_NOT_CLEAR_BONA_FIDE).
+2. `ChallengeResponseValidator` is now called by the session (expiry, expected action, latency plausibility). BLINK and SMILE need `MIN_ACTION_FRAMES` (2, UNCALIBRATED seed) consecutive qualifying frames.
+3. `SupervisorAuth.authenticate()` is gated by `StubPolicy` (it is a stub).
+4. `MiniFasNetScorer` reads and checks the input shape from the model file (R1) and reports `modelVersion()` as a SHA-256 prefix of the loaded file. NOT exercised against real ORT in the audit sandbox; run `ModelQualificationTest` with the real model.
+5. `WilsonConfidenceInterval.toString()` prints `[lower, upper]` (the old middle value was the Wilson centre, not the point estimate). `IadMetrics` rates return NaN with zero trials. Report header says "aligned", not "Compliant".
+6. Typed test counts removed from docs; the generated block in TEST_REPORT.md is the only source.
+**Still open:** see AUDIT_TODO.md.

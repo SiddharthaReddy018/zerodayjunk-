@@ -7,11 +7,11 @@
 <!-- BEGIN GENERATED:tests -->
 | Metric | Value |
 |---|---|
-| Total tests | 365 |
-| Passed | 365 |
+| Total tests | 370 |
+| Passed | 370 |
 | Failed/Errors | 0 |
 | Skipped | 0 |
-| Test classes | 43 |
+| Test classes | 44 |
 
 | Test class | Tests | Pass | Fail | Skip |
 |---|---|---|---|---|
@@ -49,6 +49,7 @@
 | `liveness.evaluation.ManifestLoaderTest` | 8 | 8 | 0 | 0 |
 | `liveness.evaluation.PadMetricsTest` | 9 | 9 | 0 | 0 |
 | `liveness.evaluation.WilsonCITest` | 8 | 8 | 0 | 0 |
+| `liveness.flow.AuditHardeningTest` | 5 | 5 | 0 | 0 |
 | `liveness.flow.BandRoutingTest` | 6 | 6 | 0 | 0 |
 | `liveness.flow.DeviceErrorRecoveryTest` | 13 | 13 | 0 | 0 |
 | `liveness.flow.StateMachineMatrixTest` | 41 | 41 | 0 | 0 |
@@ -64,7 +65,7 @@
 
 # Face Liveness PAD — Evaluation Report
 
-**ISO/IEC 30107-3 Compliant · MOSIP Decode 2026**
+**ISO/IEC 30107-3 aligned (metrics and reporting structure; not a conformance claim) · MOSIP Decode 2026**
 
 **Threshold:** 70 (score 0-100, higher = more live)
 
@@ -87,17 +88,17 @@
 
 | PAI Species | APCER | N (attacks) | 95% CI |
 |---|---|---|---|
-| cutout | 0.0000 | 9 | [0.0000, 0.1496, 0.2992] |
-| print | 0.0000 | 15 | [0.0000, 0.1019, 0.2039] |
-| screen | 0.2500 | 12 | [0.0889, 0.3106, 0.5323] |
+| cutout | 0.0000 | 9 | [0.0000, 0.2992] |
+| print | 0.0000 | 15 | [0.0000, 0.2039] |
+| screen | 0.2500 | 12 | [0.0889, 0.5323] |
 
-**Worst-species headline APCER:** screen = 0.2500 [0.0889, 0.3106, 0.5323]
+**Worst-species headline APCER:** screen = 0.2500 [0.0889, 0.5323]
 
 ---
 
 ## BPCER
 
-**BPCER:** 0.0019 (N=1071) [0.0005, 0.0036, 0.0068]
+**BPCER:** 0.0019 (N=1071) [0.0005, 0.0068]
 
 ---
 
@@ -128,39 +129,39 @@
 
 | Group | BPCER | N | Subjects | CI (95%) | Status |
 |---|---|---|---|---|---|
-| mst_7 | 0.0000 | 142 | 6 | [0.0000, 0.0132, 0.0263] | EXPLORATORY |
-| mst_5 | 0.0000 | 75 | 5 | [0.0000, 0.0244, 0.0487] | EXPLORATORY |
-| mst_4 | 0.0031 | 319 | 6 | [0.0006, 0.0090, 0.0175] | EXPLORATORY |
-| mst_2 | 0.0019 | 535 | 23 | [0.0003, 0.0054, 0.0105] | EXPLORATORY |
+| mst_7 | 0.0000 | 142 | 6 | [0.0000, 0.0263] | EXPLORATORY |
+| mst_5 | 0.0000 | 75 | 5 | [0.0000, 0.0487] | EXPLORATORY |
+| mst_4 | 0.0031 | 319 | 6 | [0.0006, 0.0175] | EXPLORATORY |
+| mst_2 | 0.0019 | 535 | 23 | [0.0003, 0.0105] | EXPLORATORY |
 
 ### Gender
 
 | Group | BPCER | N | Subjects | CI (95%) | Status |
 |---|---|---|---|---|---|
-| female | 0.0017 | 605 | 27 | [0.0003, 0.0048, 0.0093] | EXPLORATORY |
-| male | 0.0021 | 466 | 13 | [0.0004, 0.0062, 0.0121] | EXPLORATORY |
+| female | 0.0017 | 605 | 27 | [0.0003, 0.0093] | EXPLORATORY |
+| male | 0.0021 | 466 | 13 | [0.0004, 0.0121] | EXPLORATORY |
 
 ### Age Group
 
 | Group | BPCER | N | Subjects | CI (95%) | Status |
 |---|---|---|---|---|---|
-| 50+ | 0.0000 | 431 | 16 | [0.0000, 0.0044, 0.0088] | EXPLORATORY |
-| 30-40 | 0.0092 | 109 | 5 | [0.0016, 0.0259, 0.0501] | EXPLORATORY |
-| 20-30 | 0.0060 | 166 | 6 | [0.0011, 0.0172, 0.0333] | EXPLORATORY |
-| 0-20 | 0.0000 | 167 | 5 | [0.0000, 0.0112, 0.0225] | EXPLORATORY |
-| 40-50 | 0.0000 | 198 | 8 | [0.0000, 0.0095, 0.0190] | EXPLORATORY |
+| 50+ | 0.0000 | 431 | 16 | [0.0000, 0.0088] | EXPLORATORY |
+| 30-40 | 0.0092 | 109 | 5 | [0.0016, 0.0501] | EXPLORATORY |
+| 20-30 | 0.0060 | 166 | 6 | [0.0011, 0.0333] | EXPLORATORY |
+| 0-20 | 0.0000 | 167 | 5 | [0.0000, 0.0225] | EXPLORATORY |
+| 40-50 | 0.0000 | 198 | 8 | [0.0000, 0.0190] | EXPLORATORY |
 
 ### Lighting
 
 | Group | BPCER | N | Subjects | CI (95%) | Status |
 |---|---|---|---|---|---|
-| good | 0.0019 | 1071 | 40 | [0.0005, 0.0036, 0.0068] | conclusive |
+| good | 0.0019 | 1071 | 40 | [0.0005, 0.0068] | conclusive |
 
 ### Glasses
 
 | Group | BPCER | N | Subjects | CI (95%) | Status |
 |---|---|---|---|---|---|
-| no | 0.0019 | 1071 | 40 | [0.0005, 0.0036, 0.0068] | conclusive |
+| no | 0.0019 | 1071 | 40 | [0.0005, 0.0068] | conclusive |
 
 No groups flagged for BPCER swing > ±5pp.
 
@@ -173,10 +174,12 @@ No groups flagged for BPCER swing > ±5pp.
 
 | Component | N | p50 (ms) | p90 (ms) | p95 (ms) | p99 (ms) | max (ms) |
 |---|---|---|---|---|---|---|
-| pad_scoring | 1107 | 17.59 | 18.99 | 20.52 | 305.74 | 339.55 |
-| ps_pd_inference | 1107 | 3.91 | 4.38 | 4.49 | 4.71 | 30.83 |
-| ps_pd_preprocess | 1107 | 0.87 | 1.18 | 1.35 | 14.84 | 26.00 |
-| ps_pd_total | 1107 | 4.81 | 5.39 | 5.65 | 22.65 | 31.73 |
+| pad_scoring | 1107 | 17.59 | 19.19 | 20.48 | 306.43 | 356.43 |
+| ps_pd_inference | 1107 | 3.93 | 4.39 | 4.61 | 5.82 | 25.44 |
+| ps_pd_preprocess | 1107 | 0.87 | 1.20 | 1.38 | 14.63 | 41.10 |
+| ps_pd_total | 1107 | 4.85 | 5.47 | 6.12 | 19.65 | 50.75 |
+
+---
 
 ---
 
@@ -186,8 +189,8 @@ Evaluated genuine and impostor face pairs across ONOT subjects using OpenCV Zoo 
 
 | Pair Type | N (pairs) | Mean Cosine Distance | Min Dist | Max Dist | Outcome at $\tau = 0.48$ | Wilson 95% Confidence Interval |
 |---|---|---|---|---|---|---|
-| **Genuine (Same Person)** | 50 | **0.3104** | 0.1910 | 0.4872 | **FRR = 1/50 (2.0%)** | [0.0035, 0.0542, 0.1050] |
-| **Impostor (Different Person)** | 100 | **0.7037** | 0.3109 | 0.9082 | **FAR = 4/100 (4.0%)** | [0.0157, 0.0570, 0.0984] |
+| **Genuine (Same Person)** | 50 | **0.3104** | 0.1910 | 0.4872 | **FRR = 1/50 (2.0%)** | [0.0035, 0.1050] |
+| **Impostor (Different Person)** | 100 | **0.7037** | 0.3109 | 0.9082 | **FAR = 4/100 (4.0%)** | [0.0157, 0.0984] |
 
 * **Acceptance:** Real different-person pairs fail the check (96% impostor rejection rate) and same-person pairs pass (98% genuine verification rate) at threshold $\tau = 0.48$.
 
@@ -204,10 +207,10 @@ Evaluated by streaming all 36 video recordings from the **Kaggle Anti-Spoofing R
 | **Attack** | `print` | 9 | 1 | **0.1111** (11.1%) | **0.8889** (88.9%) | **0.0000** (0/1 pass) |
 | **Attack** | `screen` | 9 | 5 | **0.5556** (55.6%) | **0.4444** (44.4%) | **0.2000** (1/5 pass) |
 | **Attack** | `cutout` | 9 | 0 | **0.0000** (0.0%) | **1.0000** (100.0%) | **0.0000** (0/0 pass) |
-| **Bona Fide** | `live_video` | 9 | 2 | **0.2222** (22.2%) | **0.7778** (77.8%) | **0.5000** (1/2 rejected) |
+| **Bona Fide** | `live_video` | 9 | 2 | **0.2222** (22.2%) | **0.7778** (77.8%) | **0.5000** (1/2 rejected; N=2, not statistically meaningful) |
 
 **Key Findings:**
-1. **Multi-layer Defense:** Across all 27 attack presentations, **26 out of 27 attack videos were completely defeated** (overall attack defeat rate: **96.3%**):
+1. **Outcome split (not a PAD detection rate):** Of 27 attack presentations, 26 did not result in an accepted capture. Most of these are quality-gate non-response (video not acquired), not PAD detections; only 6 reached PAD scoring (5 of 6 flagged). Report non-response and PAD detection separately:
    - 21 attack presentations (77.8%) were stopped cold at the **Quality Gate / Positioning phase** (APNRR: non-response due to paper/screen glare, blur, and motion artifacts).
    - Of the 6 attack presentations that produced frames sufficient for acquisition, 5 were flagged and defeated by `MiniFASNetV2-SE` (mean PAD scores: 0.0, 1.2, 15.8, 55.7, 69.0 < 70).
 2. **Standard Conformance:** Demonstrates true ISO/IEC 30107-3 session-level behavior where quality gates actively filter presentation attack instruments before PAD classification.
@@ -237,5 +240,5 @@ Evaluated by streaming all 36 video recordings from the **Kaggle Anti-Spoofing R
 | 3D silicone/resin mask | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
 | Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
 | Injection attacks | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
-| Frozen frame | **Detection** | High-reliability via frame sequence monitor |
-| Frame loop replay | **Detection** | Reliable for non-adaptive replay |
+| Frozen frame | **Detection** | Detected for identical pHash sequence; unmeasured in offline still benchmark |
+| Frame loop replay | **Detection** | Detected for repeated sequence window; unmeasured in offline still benchmark |
