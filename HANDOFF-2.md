@@ -290,6 +290,9 @@ First entry uses `"GENESIS"` as previous hash.
 12. **Do not use mapped 0-100 quality scores or a cut-off of 50 for gating** (R3); **do not add demographic thresholds or infer demographics** (R4); **do not let a profile loosen PAD thresholds** (R5).
 13. **Do not publish pooled-only results or ACER** (R6), and **do not rely on p-values or cells under 30 subjects** (R7).
 14. **Do not turn FYI items (15.6) into requirements.**
+15. **Do not let any security component degrade silently to a stub** (R8); **do not feed the PAD model empty or placeholder tensors**; **do not preset a same-face result outside tests**.
+16. **Do not generate evaluation scores from hashes, random numbers or typed constants, and do not type metric or test-count values into documents** (R9). A test that did not run is "skipped", not "passed".
+17. **Do not sign a subset of what the verifier is told to trust**, and do not leave blocked/failed sessions without a signed audit head (R10).
 
 ---
 
@@ -512,7 +515,7 @@ Three research papers plus a check of the actual repos/docs were reviewed after 
 
 | Level | Meaning |
 |---|---|
-| **MUST (R1-R7)** | Binding. Small in number on purpose. Tested or reported. |
+| **MUST (R1-R10)** | Binding. Small in number on purpose. Tested or reported. R8-R10 were added after the Oct 2026 code audit (ADR-010). |
 | **SHOULD (S1-S8)** | Cheap and sensible. Do it unless dev-set evidence shows no gain; if skipped, note it in `docs/decisions.md`. |
 | **FYI (15.6)** | Context and numbers. **Do not implement** unless the owner asks. |
 
@@ -545,6 +548,12 @@ Three research papers plus a check of the actual repos/docs were reviewed after 
 **R6 - Evaluation reports are per species; pooled-only reports are forbidden.** `[PAPER]` In G26 only ~1.5% of attack samples (1,128 of 74,585) are deepfake videos, so its headline AUC 0.999 is dominated by physical attacks, and deepfake-only slices were far worse (BPCER up to 0.26 after unified training). Report APCER per PAI species with Wilson CIs and **headline the worst species** (ISO's system-level recommendation is the maximum APCER over species `[WEB]`), plus BPCER. Report image-level and video-level results separately. Do not report ACER in the ISO-style table (see 15.7 item 1). A deepfake replayed on a screen is tagged `species=screen, content_origin=deepfake`; a digitally injected deepfake is an injection attack for CaptureIntegrity, not for PAD.
 
 **R7 - Fairness claims need enough subjects and effect sizes.** Keep the S12.4 stratified BPCER/APCER and +/-5 pp flag. In addition: a cell with fewer than **30 bona fide subjects** is labelled *exploratory* (Wilson CI, no conclusions); report rates/differences with CIs, **not ANOVA p-values** (with N in the thousands everything is "significant" — U26 found p < 0.05 everywhere); decide the Monk-band merge rule before seeing results. Use age bins 0-20, 20-30, 30-40, 40-50, 50+ (comparable with U26).
+
+**R8 - No stub, no fail-open: a security component either runs for real or refuses to run.** `[AUDIT]` A PAD scorer that falls back to a fixed passing score when its model file is missing, or a same-face checker whose result can be preset, approves everyone. Rules: (a) `new MiniFasNetScorer(path)` with a non-null path **must** load the model or throw; only `null` means "explicit stub"; (b) stub scorers and stubbed same-face checkers are accepted only when the JVM property `liveness.allowStubs=true` is set (`StubPolicy`); the Maven surefire config sets it, production JVMs and Android release builds must not; (c) a frame that cannot be scored (no pixels, bad buffer) scores 0 and is treated as an attack/quality failure, never as a pass; (d) the PAD model receives real preprocessed pixels (`PadPreprocessor`: 1.5x square crop, reflect-101, 128x128, RGB, CHW, [0,1]) and the same-face check receives real embeddings from the injected `FaceEmbedder`; with no embedder it fails closed. Tests: `MiniFasNetScorerFailClosedTest`, `StubPolicyTest`, `PadPreprocessorTest`, `RealSameFaceWiringTest`.
+
+**R9 - Every reported number must come from code that ran, and every report states its provenance.** `[AUDIT]` Evaluation reports are generated from the real scorer on the real manifest; no hash-based, random or hand-written score generators and no typed-in metric values (including IAD rows) anywhere on the path to `TEST_REPORT.md`. A test that cannot run (missing model, manifest, dataset) is reported as **skipped** (JUnit assumption), never as passed. A metric the run cannot measure (e.g. APNRR/BPNRR/APAR on stills) is listed under "Metrics Not Measured in This Run" with the reason (`EvaluationReport.addNotMeasured`); it is never estimated, defaulted to 0 or derived. Each report carries an "Evaluation Provenance and Limits" section generated at run time: scorer identity, manifest and split, how many samples used a real face box vs a whole-image crop, whether bona fide data are stills or live presentations, and that "0 errors" means "below the CI upper bound". Test counts in documents are produced by `tools/test_report_counts.py` from Surefire XML, never typed. Tests: `EvaluationProvenanceTest`; runner: `BenchmarkReportRunnerTest`.
+
+**R10 - Signatures must cover everything the verifier is asked to trust, and every outcome leaves an anchored trail.** `[AUDIT]` The attestation signature covers subject, session, verdict, image hash, transcript hash, tier, timestamps, **model version, config version, capture mode, PAD decision/score/mechanisms, challenge echoes and the signer public key**, with field escaping so `|` cannot shift the layout. The transcript hash is taken **after** the commit entry is logged. The attestation is published on the session only after the SUCCESS transition has fired. For **every** terminal outcome (success, blocked, failed, device error) the session produces a signed audit head (`AuditSeal`: session id, size, head hash, public key) so a rewritten, truncated or extended log is detectable. Limit: this does not defend against an attacker who holds the signing key; production keys belong in the platform key store. Tests: `AttestationCoverageTest`, `AuditSealTest`.
 
 ### 15.3 SHOULD
 
@@ -592,6 +601,10 @@ Three research papers plus a check of the actual repos/docs were reviewed after 
 | M1 | `DeviceErrorRecoveryTest` | 16.2 DEVICE_ERROR recovery: benign reasons are free and bounded, integrity failures count toward lock |
 | M2 | `ModelQualificationTest` | R1: channel order, scaling, class order, score direction on known live/spoof crops |
 | M2 | `PoseGateRawUnitsTest` | R3: a ~25 degree-yaw fixture is judged on degrees (stream gate), not on a mapped score |
+| M2 | `MiniFasNetScorerFailClosedTest`, `PadPreprocessorTest` | R8: missing/corrupt model throws; preprocessing shape, channel order, range, reflect border |
+| M3 | `StubPolicyTest`, `RealSameFaceWiringTest` | R8: stubs refused without `liveness.allowStubs`; same-face decided from embeddings, fail closed without an embedder |
+| M4 | `AttestationCoverageTest`, `AuditSealTest` | R10: every reported field is signed; truncated/extended/rewritten logs fail the signed head |
+| M5 | `EvaluationProvenanceTest` | R9: a report without a provenance section is flagged; the section is rendered |
 | M5 | `EvalReportContractTest` | R6: per-species APCER rows with CIs, BPCER row, worst-species headline, no ACER, IAD in a separate table, refuses pooled-only |
 
 **Manifest (backward-compatible).** Keep the M5 columns. The loader must accept manifests without these optional trailing columns: `gender, age_group, capture_device, content_origin`. `age_group` in {0-20, 20-30, 30-40, 40-50, 50+}; `content_origin` in {real, deepfake}. Used for offline evaluation only (R4).

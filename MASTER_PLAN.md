@@ -1157,6 +1157,10 @@ Mandatory metrics beyond APCER/BPCER:
 
 For a PAD subsystem returning a score, the standard says to express both error rates as functions of the decision threshold (DET curve), not one fixed operating point.
 
+**Measurement scope of the mandatory extras (ADR-010, R9).**
+- **PS-PD** is measured by the evaluation runner: PAD preprocessing + model inference per image (`ps_pd_preprocess`, `ps_pd_inference`, `ps_pd_total` rows). It is reported with the machine it ran on; a desktop-JVM figure is not a phone figure (use `ScorerBenchmark` on a device for that).
+- **APNRR / BPNRR / APAR** describe a live capture session: no response from the device, or no sample of sufficient quality acquired. They cannot be measured from a still-image manifest, because no capture step exists to fail. They are therefore listed in the report under "Metrics Not Measured in This Run" with the reason, and are **never estimated, defaulted to 0 or derived from other numbers**. They become measurable only when PAI recordings (`PAI_RECORDING_PROTOCOL.md`) are run through the real capture pipeline and per-session outcomes (timeouts, device errors, quality-gate never satisfied) are counted. The exact ISO/IEC 30107-3 wording of these definitions has not been checked against the standard text by this project; verify before claiming conformance.
+
 **ACER is not conformant** — the standard explicitly forbids reporting a combined/averaged metric. Do not report it.
 
 Report APCER **per PAI species** across multiple artefact intensities within each species (print: 300/600/1200 dpi; screen: phone/tablet/laptop; video: varying quality). A score achieving good APCER only at one resolution has not been validated.
@@ -1308,6 +1312,19 @@ Based on systems engineering reviews, the following "Group A" betterments are **
 ### 26.15 End-to-End User Journey Metrics
 **Requirement:** PAD model metrics alone aren't enough to judge system usability.
 - **Design:** Beyond just PAD latencies, measure the total duration of the end-to-end journey: `T_capture`, `T_passive`, `T_challenge`, `T_rcapture`, `T_final_verification`, and `T_total`. Additionally, track operational outcomes: retry rate, abort rate, and device error rate.
+
+### 26.16 Production Stub Guard and Fail-Closed Components (ADR-010, HANDOFF R8)
+**Requirement:** No security decision may rest on a placeholder.
+- **Design:** `MiniFasNetScorer` loads its model or throws; `null` is the only explicit stub. `StubPolicy` refuses stub scorers and stubbed same-face checkers unless `-Dliveness.allowStubs=true` (set only by the test build). Frames that cannot be scored count as 0. The session feeds the PAD model through `PadPreprocessor` and feeds same-face through the injected `FaceEmbedder`; without an embedder the check fails closed. Modules whose backend is absent in a deployment (e.g. no JPEG 2000 decoder, no embedder) must reject, never approximate.
+- **Known gap by design:** `ReferenceFaceEmbedder` (an 8x8 luma/gradient grid) is a deterministic placeholder, not an identity model: unrelated images land well inside the 0.60 threshold. Production deployments must inject a trained embedder (SFace/ArcFace) and calibrate the threshold on their own data (R3).
+
+### 26.17 Evaluation Provenance (ADR-010, HANDOFF R9)
+**Requirement:** An evaluation number is only as good as the pipeline and data that produced it, and the report must say so.
+- **Design:** Reports are generated from the real scorer on the real manifest. Each report includes a run-time generated provenance section (scorer, manifest/split, face-localisation coverage from `tools/detect_face_boxes.py`, still-vs-live bona fide data, zero-error interpretation). Missing prerequisites yield *skipped*, not *passed*. Test counts come from `tools/test_report_counts.py` over Surefire XML. Live-presentation bona fide capture and self-recorded PAIs (`PAI_RECORDING_PROTOCOL.md`) remain mandatory for any claim beyond "benchmark on stills"; synthetic stills cannot substitute for them.
+
+### 26.18 Signed Evidence for Every Outcome (ADR-010, HANDOFF R10)
+**Requirement:** The signature must cover what the verifier relies on, and blocked or failed sessions must leave verifiable evidence too.
+- **Design:** The attestation canonical string includes model/config version, capture mode, PAD result, challenge echoes and the signer public key (escaped, pipe-delimited), and is built after the commit entry so the transcript hash covers it. `AuditSeal` signs `AUDITHEAD|session|size|head|pubkey` for every terminal outcome. Production signing keys live in the Android Keystore / HSM (the current `EcdsaSignerStub` generates an ephemeral key and is a development stand-in).
 
 ---
 
