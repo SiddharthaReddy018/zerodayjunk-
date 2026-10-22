@@ -7,11 +7,11 @@
 <!-- BEGIN GENERATED:tests -->
 | Metric | Value |
 |---|---|
-| Total tests | 467 |
-| Passed | 457 |
+| Total tests | 476 |
+| Passed | 473 |
 | Failed/Errors | 0 |
-| Skipped/Aborted | 10 |
-| Test classes | 55 |
+| Skipped | 3 |
+| Test classes | 56 |
 
 | Test class | Tests | Pass | Fail | Skip |
 |---|---|---|---|---|
@@ -19,12 +19,12 @@
 | `liveness.android.CameraXDeviceAdapterTest` | 13 | 13 | 0 | 0 |
 | `liveness.android.CrossStreamBinderTest` | 7 | 7 | 0 | 0 |
 | `liveness.android.EnvironmentIntegrityCheckerTest` | 17 | 17 | 0 | 0 |
-| `liveness.android.Int8ModelBenchmarkTest` | 1 | 0 | 0 | 1 |
+| `liveness.android.Int8ModelBenchmarkTest` | 1 | 1 | 0 | 0 |
 | `liveness.android.Iso19794FaceTest` | 6 | 6 | 0 | 0 |
 | `liveness.android.LatencyBenchmarkTest` | 5 | 5 | 0 | 0 |
 | `liveness.android.LivenessPlatformChannelTest` | 16 | 16 | 0 | 0 |
-| `liveness.android.SFaceEmbedderTest` | 2 | 1 | 0 | 1 |
-| `liveness.android.SbiCaptureFinalIntegrationTest` | 2 | 1 | 0 | 1 |
+| `liveness.android.SFaceEmbedderTest` | 2 | 2 | 0 | 0 |
+| `liveness.android.SbiCaptureFinalIntegrationTest` | 2 | 2 | 0 | 0 |
 | `liveness.android.SbiIntentBridgeTest` | 32 | 32 | 0 | 0 |
 | `liveness.android.SbiJwtVerifierTest` | 19 | 19 | 0 | 0 |
 | `liveness.android.TestGridEmbedderTest` | 3 | 3 | 0 | 0 |
@@ -34,6 +34,7 @@
 | `liveness.capture.FrameSequenceMonitorFalsePositiveTest` | 5 | 5 | 0 | 0 |
 | `liveness.capture.FrameSequenceMonitorLoopDetectionTest` | 5 | 5 | 0 | 0 |
 | `liveness.capture.FrameSequenceMonitorTest` | 10 | 10 | 0 | 0 |
+| `liveness.capture.FreshnessCheckerClockSkewTest` | 9 | 9 | 0 | 0 |
 | `liveness.challenge.ChallengeGeneratorTest` | 12 | 12 | 0 | 0 |
 | `liveness.challenge.ChallengeResponseValidatorTest` | 5 | 5 | 0 | 0 |
 | `liveness.crypto.AndroidKeyStoreSignerTest` | 3 | 3 | 0 | 0 |
@@ -43,7 +44,7 @@
 | `liveness.device.MockDevicePerceptualHashTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.LandmarkDetectorTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.MiniFasNetScorerFailClosedTest` | 3 | 3 | 0 | 0 |
-| `liveness.engine.ModelQualificationTest` | 4 | 0 | 0 | 4 |
+| `liveness.engine.ModelQualificationTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.ModelRegistryTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.PadPreprocessorTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.PoseGateRawUnitsTest` | 4 | 4 | 0 | 0 |
@@ -72,14 +73,12 @@
 | `liveness.service.RealSameFaceWiringTest` | 5 | 5 | 0 | 0 |
 <!-- END GENERATED:tests -->
 
-### Aborted Tests (10 tests skipped via `assumeTrue`)
-Per project hard constraints, test execution never silently passes when external hardware, models, or datasets are absent. Ten tests are reported as aborted (`Skipped` / `assumeTrue`):
-- `liveness.engine.ModelQualificationTest` (4 tests): Skipped because production ONNX model binary (`MiniFASNetV2-SE.onnx`) is not packaged in git repo (Part 2 X2).
-- `liveness.service.LivenessServiceIntegrationTest` (2 tests): Skipped because real camera hardware and production ONNX model are offline in local sandbox (Part 2 X2, X13).
-- `liveness.android.SFaceEmbedderTest` (1 test): Skipped because `face_recognition_sface.onnx` is not present locally (Part 2 X5).
-- `liveness.android.Int8ModelBenchmarkTest` (1 test): Skipped because `MiniFASNetV2-SE-int8.onnx` is not present locally (Part 2 X4).
-- `liveness.android.SbiCaptureFinalIntegrationTest` (1 test): Skipped because SBI model assets are offline (Part 2 X11).
-- `liveness.evaluation.BenchmarkReportRunnerTest` (1 test): Skipped because full evaluation manifest CSV is absent on disk (Part 2 X12).
+### Aborted Tests (3 tests skipped via `assumeTrue`)
+Per project hard constraints, test execution never silently passes when external hardware, models, or datasets are absent. Three tests are reported as aborted (`Skipped` / `assumeTrue`):
+- `liveness.service.LivenessServiceIntegrationTest` (2 tests): Skipped because external dataset frame files (`datasets/onot/digital/...` and `datasets/attacks/print/...`) are not present in git repository (Part 2 X12, X13).
+- `liveness.evaluation.BenchmarkReportRunnerTest` (1 test): Skipped because evaluation manifest CSV (`datasets/manifests/evaluation_benchmark_manifest.csv`) is not present on disk (Part 2 X12).
+
+Note: Seven model qualification and execution tests (`ModelQualificationTest` x4, `SFaceEmbedderTest` x1, `Int8ModelBenchmarkTest` x1, `SbiCaptureFinalIntegrationTest` x1) pass when local ONNX model binaries matching `licence-register.md` are installed in `datasets/models/`.
 
 ---
 
