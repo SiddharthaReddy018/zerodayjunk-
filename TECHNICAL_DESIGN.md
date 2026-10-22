@@ -377,7 +377,7 @@ Messages keyed by state name, loaded from `UiMessages`.
 | Curved print | **Secondary target** | Increased resistance; detection under favourable conditions |
 | 2D rigid mask | **Secondary target** | Increased resistance; detection under favourable conditions |
 | 3D silicone/resin mask | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
-| Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
+| Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + frame sequence monitoring; no detection guarantee |
 | Injection attacks | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
 | Frozen frame | **Detection** | Detected for identical pHash sequence; unmeasured in offline still benchmark |
 | Frame loop replay | **Detection** | Detected for repeated sequence window; unmeasured in offline still benchmark |

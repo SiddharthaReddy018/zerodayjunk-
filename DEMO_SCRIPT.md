@@ -115,7 +115,7 @@ mvn test -Dtest='liveness.capture.*Test,liveness.audit.*Test'
 
 ### Verified Protections:
 1. **Frame Freeze Detection:** `FrameSequenceMonitor` tracks SplitMix64 perceptual hashes (`pHash`) and SHA-256 content digests; identical frames across sliding windows immediately trigger `Verdict.DEVICE_FAILURE`.
-2. **Video Loop Detection:** Cyclic frame sequences across window buffers are caught and terminated (non-adjacent matching $gap \ge 1$).
+2. **Video Loop Detection:** Redesigned per ADR-015: requires intra-segment motion (`loopMinSegmentMotionBits`, default 3) and intermediate difference (`intermediateFramesDiffer`), eliminating false flags on static live scenes (0/1200 flags at windows 15 and 30) while reliably catching 6-frame looped attacks (100.0% detection rate over 200 trials under production default config). Real-camera tuning across physical camera sensor noise profiles remains unvalidated under Part 2 X13.
 3. **Session Nonce Binding:** RCAPTURE responses must match the cryptographically generated `sessionNonce` bound inside the MOSIP `transactionId`. Replayed or pre-recorded tokens are rejected.
 4. **Tamper-Evident Audit Log:** `AuditChain` uses genesis-seeded SHA-256 rolling hashes; modifying or dropping any prior event record causes `AuditChain.verify()` and `Attestation.verifyAuditLog()` to fail.
 
@@ -156,7 +156,7 @@ mvn test -Dtest=LivenessServiceIntegrationTest
 | 4 | Resident Registration | Uncertain PAD Score | Triggers Active Challenge | `PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> FINAL_CAPTURE -> SUCCESS` |
 | 5 | Resident Registration | Camera Disconnect | `Verdict.DEVICE_FAILURE` | `DEVICE_CHECK -> DEVICE_ERROR` |
 | 6 | Operator Auth | Live Operator Face | `Verdict.PASS` | Streamlined passive verification |
-| 7 | Supervisor Override | Supervisor Token | Authorized Exemption | Operator override verified in `SupervisorAuthTest` (not implemented in production wiring; see Part 2 X15; `BLOCKED_ATTACK` is never exempt) |
+| 7 | Supervisor Override | Supervisor Token | `Verdict.ATTACK` | Not wired in production; test-only. `SupervisorAuth` exists but `BLOCKED_ATTACK` is never exempt. See Part 2 X15. |
 | 8 | Infant Registration | Resident `< 5` years | `Verdict.PASS` (Passive) | Active challenge waived via `ChallengeProfile.INFANT` |
 
 ---

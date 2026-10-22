@@ -8,6 +8,15 @@
 
 This guide explains how to integrate the face liveness detection system into the MOSIP Registration Client. The system plugs into the biometric capture pipeline at the **service layer** that creates the biometric record.
 
+### PAD Pipeline Architecture
+The presentation attack detection (PAD) pipeline uses a streamlined, single-model architecture rather than legacy multi-cue heuristics (no moire/FFT, LBP texture, or Gaussian curvature stubs):
+1. **Capture Integrity (IAD):** FrameSequenceMonitor (freeze detection via byte-identical content digests, loop-replay detection via pHash Hamming sequence matching with motion verification), device identity validation, and RCAPTURE transaction/nonce freshness binding.
+2. **Quality Gate:** Laplacian blur variance, brightness bounds, face size, pose angles (yaw, pitch, roll).
+3. **Single-Model Neural PAD:** Qualified MiniFASNet V2-SE ONNX inference (80x80 face crop) yielding class 0 live / class 1 spoof probabilities.
+4. **Spatial PAD Scorer:** Sliding window spatial aggregation with quality-weighted score fusion.
+5. **Active Challenge-Response:** Randomized micro-challenges (blink, smile, head turn) for uncertain scores.
+6. **Same-Face Verification:** SFace deep face embedder (`SFaceEmbedder`) comparing host-stream frames with the final RCAPTURE frame (calibrated cosine distance threshold tau=0.48 on genuine/impostor pairs; real-camera cross-device calibration is tracked under Part 2 X5/X13).
+
 ---
 
 ## 2. Prerequisites
@@ -44,15 +53,17 @@ LivenessConfig config = LivenessConfig.defaults();
 
 // 2. Create components
 MiniFasNetScorer padScorer = new MiniFasNetScorer(modelPath);  // null for stub
-SameFaceChecker sameFaceChecker = new SameFaceChecker(0.6);
+SameFaceChecker sameFaceChecker = new SameFaceChecker(0.48); // calibrated tau=0.48 (Part 2 X5/X13 calibration caveat)
+SFaceEmbedder sfaceEmbedder = new SFaceEmbedder(sfaceModelPath);
 ChallengeGenerator challengeGen = new ChallengeGenerator(
         ChallengeGenerator.DEFAULT_POOL, Collections.emptyList());
 RetryRateLimiter limiter = new RetryRateLimiter(config.maxRetries());
 EcdsaSignerStub signer = new EcdsaSignerStub();
 
-// 3. Create service
+// 3. Create service and wire SFaceEmbedder
 LivenessService service = new LivenessService(
         config, padScorer, sameFaceChecker, challengeGen, limiter, signer);
+service.setFaceEmbedder(sfaceEmbedder);
 
 // 4. Create device adapter
 MdsHttpDeviceAdapter device = new MdsHttpDeviceAdapter("http://127.0.0.1:4501");
@@ -106,7 +117,7 @@ LivenessCallback callback = new LivenessCallback() {
     }
 };
 
-// Run on background thread — NEVER on UI thread
+// Run on background thread -- NEVER on UI thread
 executorService.submit(() ->
     service.performLiveness(subjectId, device, machineUserId,
             WorkflowType.RESIDENT_REGISTRATION, callback));
@@ -206,9 +217,9 @@ if (result.isSuccess()) {
 ```java
 switch (result.verdict()) {
     case PASS:         // Success (handled above)
-    case ATTACK:       // Presentation attack detected — do NOT save capture
-    case MAX_RETRIES:  // Retry budget exhausted — prompt operator
-    case DEVICE_FAILURE: // Device error — check hardware
+    case ATTACK:       // Presentation attack detected -- do NOT save capture
+    case MAX_RETRIES:  // Retry budget exhausted -- prompt operator
+    case DEVICE_FAILURE: // Device error -- check hardware
     case PENDING:      // Should not occur in result
 }
 ```
@@ -225,7 +236,7 @@ switch (result.verdict()) {
 ```
 UI Thread                    Background Thread
     │                              │
-    │  submit(performLiveness)  →  │
+    │  submit(performLiveness)  ->  │
     │                              ├── device.open()
     │  ← onStateChanged()         ├── frame loop
     │  ← onPreviewFrame()         │   ├── captureFrame()

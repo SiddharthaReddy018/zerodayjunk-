@@ -1,7 +1,7 @@
-# PROGRESS LOG — Face Liveness Detection + PAD (ZeroDay)
-> **Project:** MOSIP Decode 2026 — Problem 04
+# PROGRESS LOG -- Face Liveness Detection + PAD (ZeroDay)
+> **Project:** MOSIP Decode 2026 -- Problem 04
 > **Repo:** `SiddharthaReddy018/zeroday`
-> **Build Order:** HANDOFF-2.md (strict M1→M2→M3→M4→M5→M6)
+> **Build Order:** HANDOFF-2.md (strict M1->M2->M3->M4->M5->M6)
 > **Last updated:** 2026-10-19T00:46 IST
 
 ---
@@ -14,7 +14,7 @@
 
 ---
 
-## Milestone 1 — Core Skeleton ✅
+## Milestone 1 -- Core Skeleton ✅
 **Status: COMPLETE** | Completed: 2026-10-06
 **Gate: All M1 tests pass (StateMachineMatrixTest, BandTableTest, etc.)**
 
@@ -22,13 +22,13 @@
 | # | File | Status | Notes |
 |---|------|--------|-------|
 | 1 | `src/main/java/liveness/flow/LivenessState.java` | ✅ | 13-state enum, `isTerminal()` |
-| 2 | `src/main/java/liveness/flow/LivenessEvent.java` | ✅ | All events from §16.2 transition table |
+| 2 | `src/main/java/liveness/flow/LivenessEvent.java` | ✅ | All events from Section 16.2 transition table |
 | 3 | `src/main/java/liveness/flow/LivenessStateMachine.java` | ✅ | Table-driven, 31 transitions, `peek()` + `fire()` + `transitionTable()` |
 | 4 | `src/main/java/liveness/flow/RetryRateLimiter.java` | ✅ | Per-tx + per-machine-user budgets, benign vs integrity errors |
 | 5 | `src/main/java/liveness/flow/Verdict.java` | ✅ | PASS is only value that produces attestation |
 | 6 | `src/main/java/liveness/policy/LivenessConfig.java` | ✅ | All config keys with defaults |
 | 7 | `src/main/java/liveness/policy/LivenessPolicy.java` | ✅ | 4-band routing: QUALITY_FAILURE / CLEAR_ATTACK / UNCERTAIN / CLEAR_BONA_FIDE |
-| 8 | `src/main/java/liveness/policy/ChallengeProfile.java` | ✅ | DEFAULT, ACCESSIBILITY, LOW_QUALITY, INFANT, WORKFLOW_SPECIFIC — R5 bounds enforced |
+| 8 | `src/main/java/liveness/policy/ChallengeProfile.java` | ✅ | DEFAULT, ACCESSIBILITY, LOW_QUALITY, INFANT, WORKFLOW_SPECIFIC -- R5 bounds enforced |
 | 9 | `src/main/java/liveness/audit/AuditEvent.java` | ✅ | Immutable audit event |
 | 10 | `src/main/java/liveness/audit/AuditChain.java` | ✅ | Hash-chained, GENESIS seed, `verify()` and `verifySealed()` |
 | 11 | `src/main/java/liveness/audit/AuditLog.java` | ✅ | Session-aware logging (rewritten for M2 compat) |
@@ -37,7 +37,7 @@
 | 14 | `src/main/java/liveness/challenge/BoundChallenge.java` | ✅ | Fields: challengeId, sessionNonce, action, expectedSequence, issuedAtMs, expiresAtMs, sequenceIndex |
 | 15 | `src/main/java/liveness/challenge/ChallengeGenerator.java` | ✅ | SecureRandom, no immediate repeat, no session-sequence repeat |
 | 16 | `src/main/java/liveness/core/FaceFrame.java` | ✅ | Expanded in M2 with pixel data, timestamps, landmarks, bbox, pose |
-| 17 | `src/main/java/liveness/core/FrameQuality.java` | ✅ | Changed from enum → class with raw physical units (R3). GOOD/SUSPECT constants kept |
+| 17 | `src/main/java/liveness/core/FrameQuality.java` | ✅ | Changed from enum -> class with raw physical units (R3). GOOD/SUSPECT constants kept |
 | 18 | `src/main/java/liveness/device/DeviceAdapter.java` | ✅ | Interface: open(), captureFrame(), close(), isOpen() |
 | 19 | `src/main/java/liveness/device/MockDeviceAdapter.java` | ✅ | Expanded in M2: 20 scenario types (9 PAD, 3 injection, 8 edge) |
 | 20 | `src/main/java/liveness/device/DeviceException.java` | ✅ | Checked exception |
@@ -57,12 +57,12 @@
 
 ---
 
-## Milestone 2 — Engine ✅
+## Milestone 2 -- Engine ✅
 **Status: COMPLETE** | Completed: 2026-10-09
-**Gate: Bona fide fixture → SUCCESS + attestation; print fixture → BLOCKED_ATTACK; all 13 error rows tested**
+**Gate: Bona fide fixture -> SUCCESS + attestation; print fixture -> BLOCKED_ATTACK; all 13 error rows tested**
 
 ### pom.xml changes
-- Version bumped `0.1.0-M1` → `0.2.0-M2`
+- Version bumped `0.1.0-M1` -> `0.2.0-M2`
 - Added ONNX Runtime `1.16.3` dependency
 
 ### Source files (21 new files)
@@ -73,7 +73,7 @@
 | 1 | `src/main/java/liveness/capture/FrameFingerprint.java` | ✅ | pHash 64-bit, hammingDistance, computePHash |
 | 2 | `src/main/java/liveness/capture/FrameSequenceMonitor.java` | ✅ | Circular buffer: FROZEN/LOOP_REPLAY/TIMESTAMP_GAP/NONMONOTONIC/RESOLUTION_CHANGE |
 | 3 | `src/main/java/liveness/capture/SessionTransactionBinder.java` | ✅ | UUID nonce binding |
-| 4 | `src/main/java/liveness/capture/FreshnessChecker.java` | ✅ | ±30s timestamp check |
+| 4 | `src/main/java/liveness/capture/FreshnessChecker.java` | ✅ | +/-30s timestamp check |
 | 5 | `src/main/java/liveness/capture/DeviceIdentityValidator.java` | ✅ | Serial+cert identity lock |
 | 6 | `src/main/java/liveness/capture/CaptureIntegrityChecker.java` | ✅ | Orchestrator combining all checks |
 | 7 | `src/main/java/liveness/capture/RCaptureBindingVerifier.java` | ✅ | Final verification gate |
@@ -83,10 +83,10 @@
 |---|------|--------|-------|
 | 1 | `src/main/java/liveness/engine/QualityGate.java` | ✅ | Raw physical units (R3). RawFrameData + QualityResult inner classes |
 | 2 | `src/main/java/liveness/engine/MiniFasNetScorer.java` | ✅ | ONNX stub with `setStubScore()`, `modelVersion()`, `isStubMode()` |
-| 3 | `src/main/java/liveness/engine/SpatialPadScorer.java` | ✅ | Quality-weighted fusion §5.4 |
+| 3 | `src/main/java/liveness/engine/SpatialPadScorer.java` | ✅ | Quality-weighted fusion Section 5.4 |
 | 4 | `src/main/java/liveness/engine/DecisionEngine.java` | ✅ | Hard gates + band routing + attack persistence |
 | 5 | `src/main/java/liveness/engine/ModelRegistry.java` | ✅ | SHA-256 verification + anti-rollback counter |
-| 6 | `src/main/java/liveness/engine/LandmarkDetector.java` | ✅ | EAR/MAR/turn detection (§20.1-20.2 formulas) |
+| 6 | `src/main/java/liveness/engine/LandmarkDetector.java` | ✅ | EAR/MAR/turn detection (Section 20.1-20.2 formulas) |
 | 7 | `src/main/java/liveness/engine/SameFaceChecker.java` | ✅ | Cosine distance with stub mode |
 | 8 | `src/main/java/liveness/engine/MoireAnalyzer.java` | ✅ | Tier B stub |
 | 9 | `src/main/java/liveness/engine/LbpTextureAnalyzer.java` | ✅ | Tier B stub |
@@ -126,11 +126,11 @@
 | 7 | `src/test/java/liveness/evaluation/AttackTaxonomyTest.java` | ✅ |
 
 ### Pending for M2 (non-blocking)
-- `ModelQualificationTest` — needs actual ONNX model file to verify channel order/scaling. Will be done when model file is provided.
+- `ModelQualificationTest` -- needs actual ONNX model file to verify channel order/scaling. Will be done when model file is provided.
 
 ---
 
-## Milestone 3 — Desktop Integration ✅
+## Milestone 3 -- Desktop Integration ✅
 **Status: COMPLETE** | Started: 2026-10-09 | Completed: 2026-10-15
 **Gate: End-to-end 3 workflows on MockMDS; frozen/loop caught; device identity change rejected**
 
@@ -139,25 +139,25 @@
 |---|-----------|---------|--------|-------|
 | 1 | `MdsDeviceInfo.java` | `device` | ✅ | Immutable DTO for device discovery / metadata (MOSIPDINFO/SBIDISC) |
 | 2 | `MdsResponse.java` | `device` | ✅ | Wrapper for MDS HTTP responses, BiometricData, and ErrorInfo |
-| 3 | `MdsHttpDeviceAdapter.java` | `device` | ✅ | HTTP adapter: `MOSIPDINFO`, `SBIDISC`/`MOSIPDISC`, `STREAM`, `RCAPTURE` (§18) |
+| 3 | `MdsHttpDeviceAdapter.java` | `device` | ✅ | HTTP adapter: `MOSIPDINFO`, `SBIDISC`/`MOSIPDISC`, `STREAM`, `RCAPTURE` (Section 18) |
 | 4 | `MdsStreamReader.java` | `device` | ✅ | MJPEG multipart stream parser for live camera preview |
-| 5 | `LivenessService.java` | `service` | ✅ | Service-layer enforcement (§22) — orchestrator driving `LivenessSession` |
+| 5 | `LivenessService.java` | `service` | ✅ | Service-layer enforcement (Section 22) -- orchestrator driving `LivenessSession` |
 | 6 | `LivenessServiceConfig.java` | `service` | ✅ | Config wrapper with active, last-known-good fallback & staleness check |
 | 7 | `ConfigSyncManager.java` | `service` | ✅ | Periodic daemon HTTP sync for `mosip.registration.liveness.*` |
 | 8 | `LivenessCallback.java` | `service` | ✅ | Asynchronous callback interface for UI decoupling |
-| 9 | `BoundedFrameQueue.java` | `engine` | ✅ | Bounded producer-consumer frame queue (§26.1) |
-| 10 | `InferenceWorker.java` | `engine` | ✅ | Dedicated daemon thread pulling frames for inference off UI thread (§26.1) |
+| 9 | `BoundedFrameQueue.java` | `engine` | ✅ | Bounded producer-consumer frame queue (Section 26.1) |
+| 10 | `InferenceWorker.java` | `engine` | ✅ | Dedicated daemon thread pulling frames for inference off UI thread (Section 26.1) |
 | 11 | `UiEventType.java` | `ui` | ✅ | Typed event enum for state changes, guidance, challenges, results |
 | 12 | `UiEvent.java` | `ui` | ✅ | Immutable UI event matching `ui-contract/events-schema.json` |
 | 13 | `LivenessUiListener.java` | `ui` | ✅ | UI callback listener interface for decoupled scene updates |
-| 14 | `UiMessages.java` | `ui` | ✅ | Localised strings (EN, FR, AR with RTL support) (§9) |
-| 15 | JavaFX UI preview & guide controls | `ui` | ⏳ | Deferred — requires JavaFX runtime; event schema ready |
+| 14 | `UiMessages.java` | `ui` | ✅ | Localised strings (EN, FR, AR with RTL support) (Section 9) |
+| 15 | JavaFX UI preview & guide controls | `ui` | ⏳ | Deferred -- requires JavaFX runtime; event schema ready |
 | 16 | `SupervisorAuthTest.java` | `test` | ✅ | 14 tests: auth, exemption rules (ATTACK never exempt), revocation |
 | 17 | `LivenessServiceIntegrationTest.java` | `test` | ✅ | 16 end-to-end tests: all workflows, attacks, device errors, callbacks |
 
 ---
 
-## Milestone 4 — Android ✅
+## Milestone 4 -- Android ✅
 **Status: COMPLETE** | Completed: 2026-10-19
 **Gate: CameraX adapter, SBI intent bridge, CrossStreamBinder, EnvironmentIntegrityChecker, Flutter platform channel & UI, 102 new unit/integration tests (333 total tests passing)**
 
@@ -192,7 +192,7 @@
 
 ---
 
-## Milestone 5 — Evaluation ✅
+## Milestone 5 -- Evaluation ✅
 **Status: COMPLETE** | Completed: 2026-10-19
 **Gate: Evaluation harness executes, ISO/IEC 30107-3 compliant reporting, zero ACER, Rule of 30 satisfied (N=99 >= 30), 231 tests pass**
 
@@ -224,9 +224,9 @@
 
 ---
 
-## Milestone 6 — Documentation ✅
+## Milestone 6 -- Documentation ✅
 **Status: COMPLETE** | Completed: 2026-10-19
-- `docs/TEST_REPORT.md`: Updated to v0.6.0 with full benchmark results (338 tests, 37 test classes [superseded by post-audit: 370 tests, 44 test classes]), per-species APCER, Wilson CIs, IAD metrics, and Monk scale fairness.
+- `docs/TEST_REPORT.md`: Updated to v0.6.0 with full benchmark results (**SUPERSEDED**: 338/370 test counts are stale; see generated test block below for current counts), per-species APCER, Wilson CIs, IAD metrics, and Monk scale fairness.
 - `docs/TECHNICAL_DESIGN.md`: Updated to v0.6.0 with evaluation harness architecture, test breakdown, ADR-009 reference, and honest coverage statement.
 - `docs/INTEGRATION_GUIDE.md`: Updated to v0.6.0 with quick start, MDS adapters, Android CameraX/SBI setup, and benchmark harness runner instructions.
 - `docs/DEMO_SCRIPT.md`: Comprehensive step-by-step evaluator and judge demonstration walkthrough.
@@ -257,7 +257,7 @@ All third-party components must be documented before shipping. See `docs/licence
 ---
 
 ## Environment Notes
-- **Java:** OpenJDK 25.0.1 (Temurin) — compiles with `--release 11`
+- **Java:** OpenJDK 25.0.1 (Temurin) -- compiles with `--release 11`
 - **Maven:** 3.9.11
 - **OS:** macOS 26.2 (aarch64)
 - **Java target:** 11 (no Java 14+ features)
@@ -292,7 +292,7 @@ All third-party components must be documented before shipping. See `docs/licence
 | 2026-10-15 | Created `LivenessServiceIntegrationTest.java` (16 end-to-end tests) | Agent |
 | 2026-10-15 | Fixed MockDeviceAdapter: added dummy pixel data for RCAPTURE path | Agent |
 | 2026-10-15 | Fixed RCAPTURE nonce binding: added `boundTransactionId()` to Session/CaptureIntegrity | Agent |
-| 2026-10-15 | Version bumped `0.2.0-M2` → `0.3.0-M3` | Agent |
+| 2026-10-15 | Version bumped `0.2.0-M2` -> `0.3.0-M3` | Agent |
 | 2026-10-15 | **M3 GATE PASSED: 181 tests, 0 failures** | Agent |
 | 2026-10-19 | **M5 Evaluation Framework implemented** (10 classes: ManifestLoader, PadMetrics, IadMetrics, FairnessAnalyzer, LatencyMetrics, EvaluationHarness, EvaluationReport, WilsonCI, etc.) | Agent |
 | 2026-10-19 | ONOT synthetic ICAO dataset extracted (5,811 images across 179 subjects) | Agent |
@@ -306,8 +306,9 @@ All third-party components must be documented before shipping. See `docs/licence
 | 2026-10-19 | **Operational Blockers Resolved:** INT8 latency benchmark test on desktop JVM (mean 10.86 ms, p95 14.51 ms <= 200 ms; phone latency unmeasured [Part 2 X6]), ReferenceFaceEmbedder (128-D), fail-closed JP2 decoding, PEM trust anchors (`SbiJwtVerifier.fromPem`) | Agent |
 | 2026-10-19 | Added ADR-009 for Android M4 Deployment Constraints and Fallback Architecture | Agent |
 | 2026-10-19 | Fixed MockDeviceAdapter pHash false-positive freeze detection via SplitMix64 | Agent |
-| 2026-10-19 | **M6 GATE PASSED:** Stale 338/370 test entries superseded by post-remediation suite: 449 tests passing across 54 test classes, 0 failures, 0 skipped. | Agent |
+| 2026-10-19 | **M6 GATE PASSED:** Stale 338/370 test entries **SUPERSEDED** by post-remediation suite. See generated test block for current counts. | Agent |
 | 2026-10-20 | **Post-audit hardening (ADR-010, R8-R10):** fail-closed scorer, `StubPolicy`, `PadPreprocessor`, real same-face wiring, wider attestation signature, `AuditSeal`, real-model benchmark runner with run-time provenance, `tools/detect_face_boxes.py`, `tools/test_report_counts.py`. Previous TEST_REPORT numbers withdrawn pending regeneration. | Agent |
-| 2026-10-20 | **Hardening Verification & Evaluation Regeneration (ADR-011):** Applied hardening package cleanly. Inverted class output bug resolved (Class 0 = live, Class 1 = spoof). ModelQualificationTest expanded to qualify score direction and class order. DEV split threshold calibration executed (operating threshold 70 frozen; D-EER at 92). Real test split evaluation run (N=1,107: BPCER=0.0019, screen APCER=0.2500, cutout=0.0000, print=0.0000). Preprocessing parity confirmed on 30 real face crops (mean shift 0.50 points). SbiJwtVerifier bypass guarded by StubPolicy; EnvironmentIntegrityChecker false-positive gmain tightened. All 365 tests passing across 43 test classes, 0 failures, 0 skipped. | Agent |
+| 2026-10-20 | **Hardening Verification & Evaluation Regeneration (ADR-011):** Applied hardening package cleanly. Inverted class output bug resolved (Class 0 = live, Class 1 = spoof). ModelQualificationTest expanded to qualify score direction and class order. DEV split threshold calibration executed (operating threshold 70 frozen; D-EER at 92). Real test split evaluation run (N=1,107: BPCER=0.0019, screen APCER=0.2500, cutout=0.0000, print=0.0000). Preprocessing parity confirmed on 30 real face crops (mean shift 0.50 points). SbiJwtVerifier bypass guarded by StubPolicy; EnvironmentIntegrityChecker false-positive gmain tightened. **SUPERSEDED** 365 test count; see generated test block for current counts. | Agent |
 | 2026-10-20 | **Video-Level Presentation Attack Evaluation:** Streamed all 36 videos from Kaggle Anti-Spoofing Replay dataset through QualityGate and MiniFASNetV2-SE (`tools/evaluate_video_sessions.py`). Measured real session-level ISO/IEC 30107-3 metrics: APAR (print=0.1111, screen=0.5556, cutout=0.0000), APNRR (print=0.8889, screen=0.4444, cutout=1.0000), BPNRR (0.7778), Video APCER (print=0.0000, screen=0.2000, cutout=0.0000). 26/27 attack presentations defeated (96.3% overall defeat rate across multi-layer defense). Updated `docs/TEST_REPORT.md`. | Agent |
 | 2026-10-22 | **Autonomous Remediation Completed (T1-T8, ADR-014):** Fixed sequence monitor false positives with content digest (T1); implemented AndroidKeyStore EC keygen and `LivenessAndroidBootstrap` reference wiring (T2); enforced strict Rule-of-30 contract ($N \ge 30$) and synthetic IAD runner with latency/coverage metrics (T3); renamed injected tests and added 2 real pixel-dependent integration tests without stubs (T4); replaced string class checks with `FaceEmbedder.productionGrade()` interface guard (T5); sealed `auditHeadHash` in Attestation with `verifyAuditLog` (T6); added multi-hop broken issuer link tests, multi-package allowlist filtering, and environment profile verification (T7); reconciled documentation across `TEST_REPORT.md` (449 tests across 54 classes), `DEMO_SCRIPT.md`, `TECHNICAL_DESIGN.md`, `decisions.md` (ADR-014), and created `AUDIT_TODO.md` tracking Part 2 items X1-X15 (T8). | Agent |
+| 2026-10-22 | **Final Audit Fixes Completed (R1-R5, ADR-015):** Resolved F1-F7. Decoupled and validated `LivenessConfig` window/freeze parameters ($window \ge 2K+1$, $freeze \le window$, $K \ge 5$) and passed loop window to monitor (R1); redesigned loop detection with intra-segment motion prerequisite and intermediate difference requirement, eliminating static scene false alarms (0/1200 flags at window 15 and 30) while reliably catching 6-frame looped attacks (100.0% detection rate over 200 trials) (R2); aligned tests and `IadMechanismRunner` to dynamic production default config (R3); explicitly bound real `auditHeadHash` and `auditEventCount` into ECDSA canonical string and added `exportSealedHeadAndCount()` (R4); reconciled docs and test suite: 467 tests across 55 classes (457 passed, 10 aborted via `assumeTrue`, 0 failed; see generated test block in `docs/TEST_REPORT.md`) (R5). | Agent |

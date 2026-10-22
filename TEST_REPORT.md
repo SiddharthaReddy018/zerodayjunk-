@@ -7,11 +7,11 @@
 <!-- BEGIN GENERATED:tests -->
 | Metric | Value |
 |---|---|
-| Total tests | 449 |
-| Passed | 449 |
+| Total tests | 467 |
+| Passed | 457 |
 | Failed/Errors | 0 |
-| Skipped | 0 |
-| Test classes | 54 |
+| Skipped/Aborted | 10 |
+| Test classes | 55 |
 
 | Test class | Tests | Pass | Fail | Skip |
 |---|---|---|---|---|
@@ -19,37 +19,38 @@
 | `liveness.android.CameraXDeviceAdapterTest` | 13 | 13 | 0 | 0 |
 | `liveness.android.CrossStreamBinderTest` | 7 | 7 | 0 | 0 |
 | `liveness.android.EnvironmentIntegrityCheckerTest` | 17 | 17 | 0 | 0 |
-| `liveness.android.Int8ModelBenchmarkTest` | 1 | 1 | 0 | 0 |
+| `liveness.android.Int8ModelBenchmarkTest` | 1 | 0 | 0 | 1 |
 | `liveness.android.Iso19794FaceTest` | 6 | 6 | 0 | 0 |
 | `liveness.android.LatencyBenchmarkTest` | 5 | 5 | 0 | 0 |
 | `liveness.android.LivenessPlatformChannelTest` | 16 | 16 | 0 | 0 |
-| `liveness.android.SFaceEmbedderTest` | 2 | 2 | 0 | 0 |
-| `liveness.android.SbiCaptureFinalIntegrationTest` | 2 | 2 | 0 | 0 |
+| `liveness.android.SFaceEmbedderTest` | 2 | 1 | 0 | 1 |
+| `liveness.android.SbiCaptureFinalIntegrationTest` | 2 | 1 | 0 | 1 |
 | `liveness.android.SbiIntentBridgeTest` | 32 | 32 | 0 | 0 |
 | `liveness.android.SbiJwtVerifierTest` | 19 | 19 | 0 | 0 |
 | `liveness.android.TestGridEmbedderTest` | 3 | 3 | 0 | 0 |
 | `liveness.android.UiEventContractTest` | 4 | 4 | 0 | 0 |
 | `liveness.audit.AuditChainIntegrityTest` | 14 | 14 | 0 | 0 |
 | `liveness.audit.AuditSealTest` | 6 | 6 | 0 | 0 |
-| `liveness.capture.FrameSequenceMonitorFalsePositiveTest` | 4 | 4 | 0 | 0 |
+| `liveness.capture.FrameSequenceMonitorFalsePositiveTest` | 5 | 5 | 0 | 0 |
+| `liveness.capture.FrameSequenceMonitorLoopDetectionTest` | 5 | 5 | 0 | 0 |
 | `liveness.capture.FrameSequenceMonitorTest` | 10 | 10 | 0 | 0 |
 | `liveness.challenge.ChallengeGeneratorTest` | 12 | 12 | 0 | 0 |
 | `liveness.challenge.ChallengeResponseValidatorTest` | 5 | 5 | 0 | 0 |
 | `liveness.crypto.AndroidKeyStoreSignerTest` | 3 | 3 | 0 | 0 |
 | `liveness.crypto.AttestationCoverageTest` | 3 | 3 | 0 | 0 |
-| `liveness.crypto.AttestationTest` | 14 | 14 | 0 | 0 |
+| `liveness.crypto.AttestationTest` | 19 | 19 | 0 | 0 |
 | `liveness.device.MdsHttpDeviceAdapterTest` | 8 | 8 | 0 | 0 |
 | `liveness.device.MockDevicePerceptualHashTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.LandmarkDetectorTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.MiniFasNetScorerFailClosedTest` | 3 | 3 | 0 | 0 |
-| `liveness.engine.ModelQualificationTest` | 4 | 4 | 0 | 0 |
+| `liveness.engine.ModelQualificationTest` | 4 | 0 | 0 | 4 |
 | `liveness.engine.ModelRegistryTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.PadPreprocessorTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.PoseGateRawUnitsTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.SameFaceCheckerTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.SpatialPadScorerTest` | 4 | 4 | 0 | 0 |
 | `liveness.evaluation.AttackTaxonomyTest` | 2 | 2 | 0 | 0 |
-| `liveness.evaluation.BenchmarkReportRunnerTest` | 1 | 1 | 0 | 0 |
+| `liveness.evaluation.BenchmarkReportRunnerTest` | 1 | 0 | 0 | 1 |
 | `liveness.evaluation.EvalReportContractTest` | 13 | 13 | 0 | 0 |
 | `liveness.evaluation.EvaluationHarnessTest` | 8 | 8 | 0 | 0 |
 | `liveness.evaluation.EvaluationProvenanceTest` | 5 | 5 | 0 | 0 |
@@ -65,17 +66,26 @@
 | `liveness.flow.StateMachineMatrixTest` | 41 | 41 | 0 | 0 |
 | `liveness.flow.SupervisorAuthTest` | 14 | 14 | 0 | 0 |
 | `liveness.policy.BandTableTest` | 9 | 9 | 0 | 0 |
-| `liveness.policy.ChallengeProfileBoundsTest` | 15 | 15 | 0 | 0 |
+| `liveness.policy.ChallengeProfileBoundsTest` | 22 | 22 | 0 | 0 |
 | `liveness.policy.StubPolicyTest` | 6 | 6 | 0 | 0 |
-| `liveness.service.LivenessServiceIntegrationTest` | 20 | 20 | 0 | 0 |
+| `liveness.service.LivenessServiceIntegrationTest` | 20 | 18 | 0 | 2 |
 | `liveness.service.RealSameFaceWiringTest` | 5 | 5 | 0 | 0 |
 <!-- END GENERATED:tests -->
 
+### Aborted Tests (10 tests skipped via `assumeTrue`)
+Per project hard constraints, test execution never silently passes when external hardware, models, or datasets are absent. Ten tests are reported as aborted (`Skipped` / `assumeTrue`):
+- `liveness.engine.ModelQualificationTest` (4 tests): Skipped because production ONNX model binary (`MiniFASNetV2-SE.onnx`) is not packaged in git repo (Part 2 X2).
+- `liveness.service.LivenessServiceIntegrationTest` (2 tests): Skipped because real camera hardware and production ONNX model are offline in local sandbox (Part 2 X2, X13).
+- `liveness.android.SFaceEmbedderTest` (1 test): Skipped because `face_recognition_sface.onnx` is not present locally (Part 2 X5).
+- `liveness.android.Int8ModelBenchmarkTest` (1 test): Skipped because `MiniFASNetV2-SE-int8.onnx` is not present locally (Part 2 X4).
+- `liveness.android.SbiCaptureFinalIntegrationTest` (1 test): Skipped because SBI model assets are offline (Part 2 X11).
+- `liveness.evaluation.BenchmarkReportRunnerTest` (1 test): Skipped because full evaluation manifest CSV is absent on disk (Part 2 X12).
+
 ---
 
-# Face Liveness PAD — Evaluation Report
+# Face Liveness PAD -- Evaluation Report
 
-**ISO/IEC 30107-3 aligned (metrics and reporting structure; not a conformance claim) · MOSIP Decode 2026**
+**ISO/IEC 30107-3 aligned (metrics and reporting structure; not a conformance claim) * MOSIP Decode 2026**
 
 **Threshold:** 70 (score 0-100, higher = more live)
 
@@ -94,7 +104,7 @@
 
 ---
 
-## Per-Species APCER (ISO/IEC 30107-3, §24.1)
+## Per-Species APCER (ISO/IEC 30107-3, Section 24.1)
 
 | PAI Species | APCER | N (attacks) | 95% CI |
 |---|---|---|---|
@@ -127,7 +137,7 @@
 | Nonce-swap rejection | 30 | 30 | 1.0000 |
 | False IAD (legitimate) | 30 | 0 | 0.0000 |
 
-> These are detection rates, NOT APCER values (§12.2).
+> These are detection rates, NOT APCER values (Section 12.2).
 
 - **Mechanism coverage:** 100.0%
 - **Overall IAD bypass rate:** 0.0000
@@ -135,7 +145,7 @@
 
 ---
 
-## Fairness Analysis (§12.4, §24.4)
+## Fairness Analysis (Section 12.4, Section 24.4)
 
 **Bias Index:** 0.000000 (lower = more fair)
 
@@ -177,14 +187,14 @@
 |---|---|---|---|---|---|
 | no | 0.0019 | 1071 | 40 | [0.0005, 0.0068] | conclusive |
 
-No groups flagged for BPCER swing > ±5pp.
+No groups flagged for BPCER swing > +/-5pp.
 
 > CIs are Wilson score intervals at 95%. Cells with <30 subjects are EXPLORATORY (R7).
-> No ANOVA p-values reported — effect sizes and CIs only (R7).
+> No ANOVA p-values reported -- effect sizes and CIs only (R7).
 
 ---
 
-## Latency Percentiles (§26.3)
+## Latency Percentiles (Section 26.3)
 
 | Component | N | p50 (ms) | p90 (ms) | p95 (ms) | p99 (ms) | max (ms) |
 |---|---|---|---|---|---|---|
@@ -250,7 +260,7 @@ Evaluated by streaming all 36 video recordings from the **Kaggle Anti-Spoofing R
 
 ---
 
-## Honest Coverage Statement (§15.5)
+## Honest Coverage Statement (Section 15.5)
 
 | Threat | Treatment | What We Claim |
 |---|---|---|

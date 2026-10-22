@@ -6,30 +6,30 @@
 **Status:** DECIDED (HANDOFF-2 16.2)  
 **Context:** S4 calls DEVICE_ERROR terminal, S23.4 describes reconnecting.  
 **Decision:** DEVICE_ERROR is terminal for the session. Recovery is always a new session starting at DEVICE_CHECK (MOSIPDISC rediscovery). The transition carries a reason code:
-- `DEVICE_UNAVAILABLE` (benign): free — no retry budget charged; bounded by `device.max_reconnect_attempts`.
+- `DEVICE_UNAVAILABLE` (benign): free -- no retry budget charged; bounded by `device.max_reconnect_attempts`.
 - `INTEGRITY_FAILURE` (security): counts toward the lock budget; supervisor exemption not applicable.  
 **Consequence:** No boolean flags needed; reason is part of the transition event.
 
-## ADR-002: RETRY_AVAILABLE → PASSIVE retry path
+## ADR-002: RETRY_AVAILABLE -> PASSIVE retry path
 
 **Date:** 2026-10-06  
 **Status:** DECIDED (HANDOFF-2 15.7 item 4)  
 **Context:** Problem statement requires retry support with clear indication and recovery guidance.  
-**Decision:** RETRY_AVAILABLE → PASSIVE (row 22), which can fall back to POSITIONING by row 9 if quality drops. Matches the problem statement's resident workflow.  
+**Decision:** RETRY_AVAILABLE -> PASSIVE (row 22), which can fall back to POSITIONING by row 9 if quality drops. Matches the problem statement's resident workflow.  
 **Consequence:** Retry always goes through PASSIVE, not directly to POSITIONING.
 
-## ADR-003: FINAL_CAPTURE RCAPTURE failure → DEVICE_ERROR
+## ADR-003: FINAL_CAPTURE RCAPTURE failure -> DEVICE_ERROR
 
 **Date:** 2026-10-06  
 **Status:** DECIDED (HANDOFF-2 16.2 row 17)  
 **Context:** Problem statement requires handling device communication failures.  
-**Decision:** RCAPTURE failure/timeout → DEVICE_ERROR with reason DEVICE_UNAVAILABLE.  
+**Decision:** RCAPTURE failure/timeout -> DEVICE_ERROR with reason DEVICE_UNAVAILABLE.  
 **Consequence:** Subject is guided to retry via new session; no budget charged.
 
 ## ADR-004: BLOCKED_ATTACK terminal for session, not person
 
 **Date:** 2026-10-06  
-**Status:** DECIDED (MASTER_PLAN §4)  
+**Status:** DECIDED (MASTER_PLAN Section 4)  
 **Context:** v1 said "no retry ever" which conflicts with the problem statement's retry requirement.  
 **Decision:** BLOCKED_ATTACK is terminal per session. A new session is allowed through RetryRateLimiter. Each blocked session counts against the lock budget. Supervisor exemption never applies.  
 **Consequence:** Prevents abuse while allowing legitimate re-enrollment.
@@ -37,23 +37,23 @@
 ## ADR-005: Standalone reference implementation + thin integration shim
 
 **Date:** 2026-10-06  
-**Status:** ASSUMPTION (pending MOSIP answer, §14 item 10)  
+**Status:** ASSUMPTION (pending MOSIP answer, Section 14 item 10)  
 **Context:** Unknown whether this is a patch against the real registration client.  
 **Decision:** Ship standalone + thin integration shim. Do not invent MOSIP class names.  
 **Consequence:** Minimizes integration risk; can be adapted later.
 
-## ADR-006: Infant/guardian policy — passive-only + operator attestation
+## ADR-006: Infant/guardian policy -- passive-only + operator attestation
 
 **Date:** 2026-10-06  
-**Status:** ASSUMPTION (pending MOSIP answer, §14 item 9)  
+**Status:** ASSUMPTION (pending MOSIP answer, Section 14 item 9)  
 **Context:** Adult-trained quality models over-reject young children (U26).  
 **Decision:** Passive-only with operator attestation for INFANT profile.  
 **Consequence:** ChallengeProfile.INFANT has longer timeouts, no compound challenges.
 
-## ADR-007: Auth-purpose devices — DISCRETE mode
+## ADR-007: Auth-purpose devices -- DISCRETE mode
 
 **Date:** 2026-10-06  
-**Status:** ASSUMPTION (pending MOSIP answer, §14 item 7)  
+**Status:** ASSUMPTION (pending MOSIP answer, Section 14 item 7)  
 **Context:** Auth-purpose devices have no STREAM, no preview.  
 **Decision:** Assume DISCRETE mode; document the limitation.  
 **Consequence:** Liveness evidence is reduced for auth devices; same-face check + time gap compensate.
@@ -61,7 +61,7 @@
 ## ADR-008: Dataset & PAD Model Selection for Evaluation (M5)
 
 **Date:** 2026-10-19  
-**Status:** DECIDED (R1, §17.1, §17.4)  
+**Status:** DECIDED (R1, Section 17.1, Section 17.4)  
 **Context:** Idiap Replay-Attack and OULU-NPU require strict academic EULAs with permanent faculty signatures. In addition, the primary PAD model's actual export spec is 128x128 RGB rather than 80x80 BGR.  
 **Decision:**
 1. **Model:** Adopted `MiniFASNetV2-SE` ONNX export from `facenox/face-antispoof-onnx` (FP32 ~1.82MB, INT8 ~612KB) verified empirically via `ModelQualificationTest` with 128x128 RGB input.
@@ -72,19 +72,19 @@
 ## ADR-009: Android M4 Deployment Constraints and Fallback Architecture
 
 **Date:** 2026-10-19  
-**Status:** DECIDED (§18.6, §21, §26.9)  
+**Status:** DECIDED (Section 18.6, Section 21, Section 26.9)  
 **Context:** Android integration involves cross-stream binding between host CameraX frames (T3) and SBI `rCapture` intents (T1). Field deployments face mobile hardware latency limits, lack of native JPEG 2000 support, external face recognition model availability, and device-provider trust chains.  
 **Decision:**
 1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets. Empirically verified via native ONNX Runtime in `Int8ModelBenchmarkTest` (300 iterations: mean 8.15 ms, p50 8.00 ms, p95 9.45 ms), achieving >20x latency headroom for low-end devices.
-2. **Same-Face Consistency:** Provided `ReferenceFaceEmbedder` (128-D normalized spatial descriptor) for out-of-the-box cross-stream verification without external dependencies. Deep neural models (OpenCV Zoo SFace / ArcFace) plug into `FaceEmbedder` with a calibrated threshold of 0.60 cosine distance.
+2. **Same-Face Consistency:** Provided `ReferenceFaceEmbedder` (128-D normalized spatial descriptor) for out-of-the-box cross-stream verification without external dependencies. Deep neural models (OpenCV Zoo SFace / ArcFace) plug into `FaceEmbedder` with a calibrated threshold of 0.48 cosine distance (ADR-012).
 3. **JPEG 2000 Safe Fail-Closed:** Handled ISO/IEC 19794-5 JPEG frames natively via Android `BitmapFactory`. For JPEG 2000, provided the `IsoFaceRgbDecoder.Jpeg2000Decoder` interface for optional OpenJPEG JNI injection; without one, the parser fails closed safely (`Result.EMBEDDING_FAILED`), preventing unverified image substitution.
 4. **JWT Trust Anchors:** Added `SbiJwtVerifier.fromPem()` to allow dynamic loading of MOSIP Device Provider root CAs from PEM assets.
 **Consequence:** Guarantees deterministic, offline-capable, and secure Android liveness capture while maintaining strict fail-closed security invariants.
 
-## ADR-010: Post-audit hardening — fail-closed components, evaluation provenance, signed evidence
+## ADR-010: Post-audit hardening -- fail-closed components, evaluation provenance, signed evidence
 
 **Date:** 2026-10-20  
-**Status:** DECIDED (code audit of Oct 2026; HANDOFF-2 R8-R10; MASTER_PLAN §26.16-26.18)  
+**Status:** DECIDED (code audit of Oct 2026; HANDOFF-2 R8-R10; MASTER_PLAN Section 26.16-26.18)  
 **Context:** An independent audit found that (1) the PAD scorer silently fell back to a fixed passing stub and the session fed it empty tensors; (2) the session's same-face check received empty vectors and depended on a public test stub; (3) the benchmark behind TEST_REPORT.md used a hash-of-path score generator and typed-in IAD numbers; (4) the attestation signature omitted model/config/mode/PAD fields; (5) benchmark and latency tests passed silently when their inputs were missing; (6) document test counts disagreed (330/333/337/338, table sum 343).  
 **Decision:**
 1. Fail closed (R8): model must load or throw; `StubPolicy` gate (`liveness.allowStubs`); real pixels via `PadPreprocessor`; same-face via injected `FaceEmbedder`; unscorable frame = 0.
@@ -97,8 +97,8 @@
 ## ADR-011: Model Qualification, Output Class Mapping, and DEV Split Threshold Calibration
 
 **Date:** 2026-10-20  
-**Status:** DECIDED (verification of §3.1 and §3.6; HANDOFF-2 R1, R9; MASTER_PLAN §12.3)  
-**Context:** Verification of MiniFASNetV2-SE under `ModelQualificationTest` confirmed the ONNX model structure (4D tensor `[1, 3, 128, 128]`, float32, normalized `[0, 1]`, output `[1, 2]`). Testing on known bona fide (ONOT) and attack presentations revealed that output index 0 is the live (bona fide) logit and index 1 is the spoof (attack) logit. The initial scorer had inverted these indices, causing real faces to score ~0 and attacks ~100. Furthermore, threshold 70 required empirical calibration on the DEV split per §12.3 before freezing for the TEST run.  
+**Status:** DECIDED (verification of Section 3.1 and Section 3.6; HANDOFF-2 R1, R9; MASTER_PLAN Section 12.3)  
+**Context:** Verification of MiniFASNetV2-SE under `ModelQualificationTest` confirmed the ONNX model structure (4D tensor `[1, 3, 128, 128]`, float32, normalized `[0, 1]`, output `[1, 2]`). Testing on known bona fide (ONOT) and attack presentations revealed that output index 0 is the live (bona fide) logit and index 1 is the spoof (attack) logit. The initial scorer had inverted these indices, causing real faces to score ~0 and attacks ~100. Furthermore, threshold 70 required empirical calibration on the DEV split per Section 12.3 before freezing for the TEST run.  
 **Decision:**
 1. **Class Order Alignment:** In `MiniFasNetScorer`, map `liveLogit = logits[0][0]` and `spoofLogit = logits[0][1]`. Softmax probability of Class 0 determines the bona fide score on the 0-100 scale.
 2. **Score Direction Verification:** `ModelQualificationTest` was expanded to verify that uniform zero tensors produce spoof scores (<50) and bona fide samples score strictly higher than attack presentations.
@@ -109,13 +109,13 @@
 ## ADR-012: Real Neural Face Embedder Integration (SFace) and Same-Face Calibration
 
 **Date:** 2026-10-20  
-**Status:** DECIDED (verification of §4.2; HANDOFF-2 R8, R9; MASTER_PLAN §6.3, §12.3)  
-**Context:** An independent audit identified that `ReferenceFaceEmbedder` (8x8 spatial luma grid) lacked identity discrimination capacity, producing non-negative vectors where unrelated human faces had small cosine distances (0.10–0.17) below the 0.60 threshold, permitting impostor acceptance. Item 4.2 mandated integrating a trained, license-checked embedder behind `FaceEmbedder`, calibrating the threshold on genuine and impostor pairs, and reporting FAR/FRR with Wilson confidence intervals.  
+**Status:** DECIDED (verification of Section 4.2; HANDOFF-2 R8, R9; MASTER_PLAN Section 6.3, Section 12.3)  
+**Context:** An independent audit identified that `ReferenceFaceEmbedder` (8x8 spatial luma grid) lacked identity discrimination capacity, producing non-negative vectors where unrelated human faces had small cosine distances (0.10--0.17) below the initial default threshold, permitting impostor acceptance. Item 4.2 mandated integrating a trained, license-checked embedder behind `FaceEmbedder`, calibrating the threshold on genuine and impostor pairs, and reporting FAR/FRR with Wilson confidence intervals.  
 **Decision:**
 1. **Model Selection & License:** Integrated OpenCV Zoo's **SFace** (`face_recognition_sface.onnx`, 37.8 MB, Apache-2.0 license, SHA-256: `0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79`) paired with **YuNet** (`face_detection_yunet.onnx`, 227 KB, Apache-2.0, SHA-256: `8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4`). Models recorded in `docs/licence-register.md`.
 2. **Empirical Calibration:** Evaluated 50 genuine pairs (same subject, 2 distinct photos) and 100 impostor pairs (different subjects) across ONOT subjects using `tools/calibrate_same_face.py`.
-   - Genuine pairs mean cosine distance: **0.3104** (range: 0.1910–0.4872)
-   - Impostor pairs mean cosine distance: **0.7037** (range: 0.3109–0.9082)
+   - Genuine pairs mean cosine distance: **0.3104** (range: 0.1910--0.4872)
+   - Impostor pairs mean cosine distance: **0.7037** (range: 0.3109--0.9082)
 3. **Threshold Selection:** Set operational same-face threshold $\tau = 0.48$ (decision: same-face if distance $< 0.48$).
    - **FAR (False Acceptance Rate):** 4/100 = **4.00%** (95% Wilson CI: [0.0157, 0.0570, 0.0984])
    - **FRR (False Rejection Rate):** 1/50 = **2.00%** (95% Wilson CI: [0.0035, 0.0542, 0.1050])
@@ -148,4 +148,39 @@
 3. **Audit Log Sealing in Attestation:** `Attestation` exposes `auditHeadHash()` and `auditLogHeadHash()` as well as `verifyAuditLog(AuditLog)` and `verifyAuditChain(AuditChain)`. Truncating or modifying even one audit event causes verification to fail.  
 4. **Interface-Level Production Guard:** `FaceEmbedder` defines `default boolean productionGrade() { return false; }`. Production embedders like `SFaceEmbedder` override it to return `true`. Outside development mode, `LivenessService` rejects any embedder where `!embedder.productionGrade()`, preventing bypass via renaming.  
 **Consequences:** Complete mathematical and architectural integrity across live capture sequence monitoring, statistical reporting contracts, audit sealing, and production security guards.
+
+## ADR-015: Loop Replay Rule Redesign, Configuration Invariant Hardening, and Explicit Audit Head Attestation Binding
+
+**Date:** 2026-10-22  
+**Status:** DECIDED  
+**Context:**  
+An audit of commit `1fd2826` identified six residual integrity and configuration findings:
+1. `FrameSequenceMonitor` loop replay rule required $n \ge 2K+1$ buffered frames ($K \ge 5 \to 11$), but production default window was 5 (`frameFreezePHashWindowSize = 5`), rendering loop detection unreachable in real sessions (F1, F3).
+2. At larger windows (15, 30), the naive loop rule fired on static scenes (20/20 live still users flagged) because a static scene trivially matches itself in order (F2).
+3. `IadMechanismRunner` hardcoded window 15, uncoupled from the shipped configuration (F4).
+4. `LivenessConfig.Builder` coupled `frameFreezePHashWindowSize` and `freezeConsecutiveFrames` (setting one overwrote the other) and failed to enforce $window \ge 2K+1$ or $freezeConsecutiveFrames \le window$ (F5).
+5. `Attestation.auditHeadHash()` was an alias for `transcriptSha256`, and the audit event count was not covered by the ECDSA signature, allowing tail truncation if the verifier did not independently know the head (F6).
+
+**Decision:**  
+1. **Config Invariants & Decoupling (R1):** Decoupled `frameFreezePHashWindowSize` from `freezeConsecutiveFrames` in `LivenessConfig.Builder`. Updated default window to 15 ($15 \ge 2 \times 5 + 1$). Added strict validation: `build()` throws `IllegalArgumentException` if $window < 2K+1$, if $freezeConsecutiveFrames > window$, if $freezeConsecutiveFrames < 2$, if $K < 5$, or if motion/Hamming thresholds exceed [0, 64]. Added `loopWindowFrames()` accessor and passed it to `FrameSequenceMonitor` in `LivenessService`.
+2. **Loop Replay Rule Redesign (R2):**
+   - **Segment Motion Prerequisite:** A candidate repeating segment must exhibit real intra-segment motion: the maximum Hamming distance between consecutive frames within the segment must exceed `loopMinSegmentMotionBits` (default 3, range-validated). Static scenes have near-zero pHash spread and are never diagnosed as loop replays.
+   - **Intermediate Difference Requirement:** Intermediate frames between the earlier segment and replay segment must differ from the matched segment (at least one intermediate frame farther than `loopHammingThreshold`). A scene that matches continuously everywhere is recognized as static, not a loop replay.
+   - **Freeze Rule Integrity:** Byte-identical content digests determine `FROZEN`. If `contentDigest` is null, freeze detection returns false (not decidable) and never falls back to pHash equality.
+3. **Attestation Audit Head & Count Binding (R4):**
+   - Added `auditHeadHash` (the real `AuditChain.latestHash()`) and `auditEventCount` as explicit fields in `Attestation`.
+   - Included both fields in the pipe-delimited canonical string covered by the ECDSA signature: tampering with the count or head invalidates the signature.
+   - Enhanced `LivenessResult` with `exportSealedHeadAndCount()` providing sealed head hash and size.
+   - Added verification tests confirming that dropping, modifying, or reordering even one audit event breaks attestation verification.
+4. **Synthetic Test Harness Alignment (R3):**
+   - Updated `FrameSequenceMonitorFalsePositiveTest` and `FrameSequenceMonitorLoopDetectionTest` to execute against `LivenessConfig.defaultConfig()`.
+   - Configured `IadMechanismRunner` to dynamically pull window, thresholds, and parameters from `LivenessConfig.defaultConfig()`.
+
+**Consequences:**  
+- Live still user tests across sigmas {1, 2, 4} and subpixel drift {0, 1.5} px yield **0 FROZEN** and **0 LOOP_REPLAY** flags across 200 trials each at production default window 15, and at window 30 (0/1200 false flags).
+- Synthetic looped attacks with real motion and fresh noise are reliably detected ($100.0\%$ detection rate over 200 trials).
+- Attestation guarantees cryptographic tamper-evidence against audit log truncation, extension, reordering, and event count modification.
+
+**Remaining Unvalidated:**  
+- **Part 2 X13 (Real-Camera Freeze and Loop Tuning):** All results above are synthetic mechanism-level verifications under simulated Gaussian sensor noise and subpixel drift. Tuning and thresholds for physical camera sensors, lens breathing, lighting flicker, and phone video replays remain unvalidated pending physical device testing.
 
