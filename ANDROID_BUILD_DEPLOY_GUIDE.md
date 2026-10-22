@@ -193,17 +193,23 @@ public class MainActivity extends FlutterFragmentActivity {
             throw new IllegalStateException("PAD model failed to load; refusing to start");
         }
 
-        // 2. Engine
+        // 2. Production Engine & KeyStore Wiring (see LivenessAndroidBootstrap)
+        Signer signer = AndroidKeyStoreSigner.ensureKey("liveness_attestation_key");
+        Path sfaceModel = copyAsset("face_recognition_sface.onnx");
+        SFaceEmbedder embedder = new SFaceEmbedder(sfaceModel);
+        SameFaceChecker sameFaceChecker = new SameFaceChecker(0.48); // calibrated threshold (ADR-012)
+
         LivenessService service = new LivenessService(
-                LivenessConfig.defaults(), scorer, new SameFaceChecker(0.6),
-                new ChallengeGenerator(), new RetryRateLimiter(3), new EcdsaSignerStub());
+                LivenessConfig.defaults(), scorer, sameFaceChecker,
+                new ChallengeGenerator(), new RetryRateLimiter(3), signer);
+        service.setFaceEmbedder(embedder);
 
         // 3. Devices (see README-M4 section 4)
         AndroidSbiLauncher sbiLauncher = new AndroidSbiLauncher(this);
         CameraXDeviceAdapter camera = new CameraXDeviceAdapter("front", new MlKitFaceDetector());
         CrossStreamBinder binder = new CrossStreamBinder(
-                new SameFaceChecker(0.15), new ReferenceFaceEmbedder(), 8000);
-        SbiJwtVerifier verifier = SbiJwtVerifier.disabledForDevelopment();   // DEV ONLY, see 6
+                sameFaceChecker, embedder, 8000);
+        SbiJwtVerifier verifier = SbiJwtVerifier.disabledForDevelopment();   // DEV ONLY, use fromPem() in production
         SbiIntentDeviceAdapter sbi = new SbiIntentDeviceAdapter(sbiLauncher, binder,
                 camera::latestFrame, new IsoFaceRgbDecoder(new AndroidRgbDecoder(), null),
                 verifier, "Developer", "Registration", 20000);
@@ -223,10 +229,8 @@ public class MainActivity extends FlutterFragmentActivity {
 }
 ```
 
-Constructor names above come from README-M4 section 4 and the tests. The two helper
-bodies are routine and left as comments. `ReferenceFaceEmbedder` threshold 0.15 follows
-README-M4 section 7. [UNTESTED]. Check `ReferenceFaceEmbedder` and `IsoFaceRgbDecoder`
-constructors before compiling.
+Reference bootstrap implementation is provided in `LivenessAndroidBootstrap` (`android/liveness-android/src/main/java/liveness/android/glue/LivenessAndroidBootstrap.java`).
+The operational same-face threshold $\tau = 0.48$ follows ADR-012 (calibrated: FAR 4/100, FRR 1/50). Physical cross-stream mobile validation is tracked in `docs/AUDIT_TODO.md` [Part 2 X5].
 
 ### 4b. Face detector (missing piece, needed for the quality gate)
 

@@ -1,6 +1,6 @@
 # Evaluator Demonstration Script
 ## MOSIP Face Liveness Detection + Presentation Attack Detection (ZeroDay)
-### Competition: MOSIP Decode 2026 — Problem 04
+### Competition: MOSIP Decode 2026 -- Problem 04
 ### Artifact: `face-liveness-pad` | Version: 0.6.0 | Date: October 2026
 
 ---
@@ -12,11 +12,11 @@ This guide provides step-by-step instructions for judges, evaluators, and engine
 The system enforces ISO/IEC 30107-3 compliance, CEN/TS 18099 injection attack detection (IAD), and strict fail-closed state machine transitions across Desktop (MDS HTTP) and Mobile (Android CameraX + MOSIP SBI Intent Bridge).
 
 ### Evaluation Highlights
-- **100% Automated Test Coverage:** automated unit, integration, and contract tests (count: see TEST_REPORT.md generated block) pass in ~8 seconds.
+- **Automated Test Suite:** Complete automated unit, integration, and contract tests (count: see TEST_REPORT.md generated block) pass reliably.
 - **ISO/IEC 30107-3 Evaluation Harness:** Subject-disjoint benchmark with Wilson 95% confidence intervals, zero ACER reporting, and Monk Skin Tone fairness analysis.
-- **Mobile Edge Latency:** Quantized INT8 ONNX model achieves **mean 7.19 ms, p95 7.80 ms** inference time ($>20\times$ faster than the $\le 200\text{ ms}$ mobile target).
+- **Mobile Model Latency:** Quantized INT8 ONNX model achieves **mean 10.86 ms, p95 14.51 ms** inference time on desktop JVM (tested against the $\le 200\text{ ms}$ mobile target; physical phone latency is unmeasured [Part 2 X6]).
 - **Zero Foundation Model Footprint:** Model budget $\le 5\text{ MB}$ (MiniFASNetV2-SE INT8 is 612 KB; FP32 is 1.82 MB), completely offline-capable.
-- **Cryptographic Attestation:** ECDSA P-256 digital signature over canonical attestation token with non-null `imageSha256` binding and tamper-evident SHA-256 audit chaining.
+- **Cryptographic Attestation:** ECDSA P-256 digital signature over canonical attestation token with non-null `imageSha256` binding, `auditHeadHash` sealing, and tamper-evident SHA-256 audit chaining.
 
 ---
 
@@ -63,20 +63,20 @@ Validate the mobile inference speed of the quantized `MiniFASNetV2-SE-int8.onnx`
 mvn test -Dtest=Int8ModelBenchmarkTest
 ```
 
-### Observed Results:
+### Observed Results (Desktop JVM, Synthetic Input):
 ```
 === INT8 Model Benchmark Results ===
 Iterations: 300
-Mean: 7.19 ms
-p50:  6.69 ms
-p95:  7.80 ms
-p99:  11.22 ms
-Max:  64.79 ms
+Mean: 10.86 ms
+p50:  9.46 ms
+p95:  14.51 ms
+p99:  39.26 ms
+Max:  103.73 ms
 Target <= 200ms: true
-JSON: {"n":300,"meanMs":7.19,"p50Ms":6.69,"p95Ms":7.80,"p99Ms":11.22,"maxMs":64.79}
+JSON: {"n":300,"meanMs":10.86,"p50Ms":9.46,"p95Ms":14.51,"p99Ms":39.26,"maxMs":103.73}
 =====================================
 ```
-*Note: The target mobile budget is $\le 200\text{ ms}$. The measured $p95$ of $7.80\text{ ms}$ provides over $20\times$ headroom on low-end hardware.*
+*Note: Measured on desktop JVM (synthetic input). Physical phone latency on target mobile hardware is not measured [Part 2 X6].*
 
 ---
 
@@ -93,8 +93,8 @@ This runs the complete ISO/IEC 30107-3 compliant benchmark harness and generates
 ### Key ISO Verification Points:
 1. **Zero ACER:** Verifies that Attack Presentation Classification Error Rate (APCER) and Bona Fide Presentation Classification Error Rate (BPCER) are never averaged into ACER (enforced via `EvalReportContractTest`).
 2. **Per-Species APCER Breakdown:** Reports exact rates for Print, Screen, Video, Cutout, Curved Print, 2D Mask, 3D Mask, and Deepfake presentations with 95% Wilson confidence intervals.
-3. **Worst-Species Headline APCER:** System-level security metric highlights the most penetrating attack species.
-4. **Rule of 30 Compliance:** Validates that bona fide evaluation is conducted on $N=99 \ge 30$ distinct subjects.
+3. **Worst-Species Headline APCER:** System-level security metric highlights the most penetrating attack species (marked `[EXPLORATORY]` when $N < 30$).
+4. **Rule of 30 Compliance:** Validates that bona fide evaluation is conducted on $N=40 \ge 30$ distinct subjects on the benchmark manifest test split.
 5. **Separate IAD Table:** Injection attacks (freeze, loop, nonce-swap) are isolated in a CEN/TS 18099 table rather than mixed into APCER.
 6. **Fairness & Demographic Parity:** Generates the Monk Skin Tone (MST 10) Bias Index, age groups (0-20, 20-30, 30-40, 40-50, 50+), and gender breakdown.
 
@@ -114,10 +114,10 @@ mvn test -Dtest='liveness.capture.*Test,liveness.audit.*Test'
 ```
 
 ### Verified Protections:
-1. **Frame Freeze Detection:** `FrameSequenceMonitor` tracks SplitMix64 perceptual hashes (`pHash`); identical frames across sliding windows immediately trigger `Verdict.DEVICE_FAILURE`.
-2. **Video Loop Detection:** Cyclic frame sequences across window buffers are caught and terminated.
+1. **Frame Freeze Detection:** `FrameSequenceMonitor` tracks SplitMix64 perceptual hashes (`pHash`) and SHA-256 content digests; identical frames across sliding windows immediately trigger `Verdict.DEVICE_FAILURE`.
+2. **Video Loop Detection:** Cyclic frame sequences across window buffers are caught and terminated (non-adjacent matching $gap \ge 1$).
 3. **Session Nonce Binding:** RCAPTURE responses must match the cryptographically generated `sessionNonce` bound inside the MOSIP `transactionId`. Replayed or pre-recorded tokens are rejected.
-4. **Tamper-Evident Audit Log:** `AuditChain` uses genesis-seeded SHA-256 rolling hashes; modifying any prior event record causes `AuditChain.verify()` to fail.
+4. **Tamper-Evident Audit Log:** `AuditChain` uses genesis-seeded SHA-256 rolling hashes; modifying or dropping any prior event record causes `AuditChain.verify()` and `Attestation.verifyAuditLog()` to fail.
 
 ---
 
@@ -129,14 +129,14 @@ Run all Android platform integration tests (executed on standard JVM without nee
 mvn test -Dtest='liveness.android.*Test'
 ```
 
-### 102 Tests Cover:
-1. **`SbiIntentBridgeTest` (29 tests):** Validates intent URI construction (`io.sbi.device.rCapture`, `io.sbi.device.Info`), bundle arguments, timeout handling, and MOSIP DTO mapping.
-2. **`CameraXDeviceAdapterTest` (13 tests):** Validates non-blocking drop-oldest frame queues, YUV-to-RGB conversion, and luma variance tracking.
-3. **`EnvironmentIntegrityCheckerTest` (14 tests):** Validates detection of `su` root binaries, ADB debugging flags, Xposed/Frida hooking frameworks, and emulators.
-4. **`SbiJwtVerifierTest` (11 tests):** Validates JWS signature verification using PEM-encoded trust certificates (`SbiJwtVerifier.fromPem()`), payload extraction, and timestamp freshness.
-5. **`ReferenceFaceEmbedderTest` (3 tests):** Validates same-face spatial consistency across live preview frames and final SBI capture.
-6. **`Iso19794FaceTest` (6 tests):** Validates ISO/IEC 19794-5:2005 facial biometric record parsing and fail-closed JPEG 2000 handling.
-7. **`LivenessPlatformChannelTest` (16 tests):** Validates event serialization across Flutter `MethodChannel` and `EventChannel` against `ui-contract/events-schema.json`.
+### Test Suite Covers:
+1. **`SbiIntentBridgeTest`:** Validates intent URI construction (`io.sbi.device.rCapture`, `io.sbi.device.Info`), bundle arguments, timeout handling, MOSIP DTO mapping, and multi-package allowlist filtering.
+2. **`CameraXDeviceAdapterTest`:** Validates non-blocking drop-oldest frame queues, YUV-to-RGB conversion, and luma variance tracking.
+3. **`EnvironmentIntegrityCheckerTest`:** Validates detection of `su` root binaries, ADB debugging flags, Xposed/Frida hooking frameworks, and emulators across production and development profiles.
+4. **`SbiJwtVerifierTest`:** Validates JWS signature verification using PEM-encoded trust certificates (`SbiJwtVerifier.fromPem()`), multi-hop certificate chain validation, broken issuer link rejection, payload extraction, and timestamp freshness.
+5. **`TestGridEmbedderTest` & `SFaceEmbedderTest`:** Validates face embedding generation and production-grade interface enforcement.
+6. **`Iso19794FaceTest` & `SbiCaptureFinalIntegrationTest`:** Validates ISO/IEC 19794-5:2005 facial biometric record parsing and fail-closed JPEG 2000 handling.
+7. **`LivenessPlatformChannelTest`:** Validates event serialization across Flutter `MethodChannel` and `EventChannel` against `ui-contract/events-schema.json`.
 
 ---
 
@@ -150,13 +150,13 @@ mvn test -Dtest=LivenessServiceIntegrationTest
 
 | Scenario | Workflow | Presentation / Error | Expected Result | State Machine Path |
 |---|---|---|---|---|
-| 1 | Resident Registration | Live bona fide face | `Verdict.PASS` | `IDLE → POSITIONING → PASSIVE → FINAL_CAPTURE → SUCCESS` |
-| 2 | Resident Registration | 2D Print Attack | `Verdict.BLOCKED_ATTACK` | `PASSIVE → BLOCKED_ATTACK` (held over persistence window) |
-| 3 | Resident Registration | Video Screen Replay | `Verdict.BLOCKED_ATTACK` | `PASSIVE → BLOCKED_ATTACK` |
-| 4 | Resident Registration | Uncertain PAD Score | Triggers Active Challenge | `PASSIVE → CHALLENGE_PROMPT → CHALLENGE_WAIT → FINAL_CAPTURE → SUCCESS` |
-| 5 | Resident Registration | Camera Disconnect | `Verdict.DEVICE_FAILURE` | `DEVICE_CHECK → DEVICE_ERROR` |
+| 1 | Resident Registration | Live bona fide face | `Verdict.PASS` | `IDLE -> POSITIONING -> PASSIVE -> FINAL_CAPTURE -> SUCCESS` |
+| 2 | Resident Registration | 2D Print Attack | `Verdict.ATTACK` | `PASSIVE -> BLOCKED_ATTACK` (held over persistence window) |
+| 3 | Resident Registration | Video Screen Replay | `Verdict.ATTACK` | `PASSIVE -> BLOCKED_ATTACK` |
+| 4 | Resident Registration | Uncertain PAD Score | Triggers Active Challenge | `PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> FINAL_CAPTURE -> SUCCESS` |
+| 5 | Resident Registration | Camera Disconnect | `Verdict.DEVICE_FAILURE` | `DEVICE_CHECK -> DEVICE_ERROR` |
 | 6 | Operator Auth | Live Operator Face | `Verdict.PASS` | Streamlined passive verification |
-| 7 | Supervisor Override | Supervisor Token | Authorized Exemption | Operator override granted (Security invariant: `BLOCKED_ATTACK` is never exempt) |
+| 7 | Supervisor Override | Supervisor Token | Authorized Exemption | Operator override verified in `SupervisorAuthTest` (not implemented in production wiring; see Part 2 X15; `BLOCKED_ATTACK` is never exempt) |
 | 8 | Infant Registration | Resident `< 5` years | `Verdict.PASS` (Passive) | Active challenge waived via `ChallengeProfile.INFANT` |
 
 ---

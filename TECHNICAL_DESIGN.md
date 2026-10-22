@@ -340,9 +340,9 @@ Messages keyed by state name, loaded from `UiMessages`.
 - **M2 Engine Depth:** Landmark detectors (EAR, MAR, yaw), capture integrity (pHash sequence monitor, freshness, nonce binding), quality gate.
 - **M3 Desktop Integration:** MDS device adapters (STREAM, RCAPTURE, DISCOVERY), service layer, bounded async inference queue.
 - **M4 Android Implementation:** CameraX adapter (`CameraXDeviceAdapter`), MOSIP SBI intent bridge (`SbiIntentBridge`, `SbiIntentDeviceAdapter`), cross-stream binder (`CrossStreamBinder`), environment integrity checker (`EnvironmentIntegrityChecker`), Flutter platform channel (`LivenessPlatformChannel`), ISO 19794-5 record parser, and Flutter UI package (`flutter/liveness_ui`).
-- **M4 Operational Verification (ADR-009):** INT8 ONNX latency benchmark (`Int8ModelBenchmarkTest`: mean 7.19 ms, p95 7.80 ms), built-in 128-D spatial embedder (`ReferenceFaceEmbedder`), safe fail-closed JPEG 2000 decoder (`IsoFaceRgbDecoder`), and PEM certificate trust anchor ingestion (`SbiJwtVerifier.fromPem`).
-- **M5 Evaluation Framework:** ISO/IEC 30107-3 compliant evaluation harness (`liveness.evaluation`), Wilson 95% CIs, worst-species headline APCER, BPCER with Rule of 30 validation ($N=99 \ge 30$), CEN/TS 18099 IAD metrics table, and Monk scale fairness analyzer.
-- **M6 Documentation & Evaluator Tools:** Final technical design, multi-modal UI/UX guide (`UX_GUIDE.md`), evaluator walkthrough (`DEMO_SCRIPT.md`), ISO/IEC 30107-3 test report (`TEST_REPORT.md`), and decisions register (`decisions.md` ADR-001 to ADR-009).
+- **M4 Operational Verification (ADR-009, ADR-012):** INT8 ONNX desktop latency benchmark (`Int8ModelBenchmarkTest`: mean 10.86 ms, p95 14.51 ms), real neural face embedder (`SFaceEmbedder` with OpenCV Zoo SFace at calibrated threshold 0.48), safe fail-closed JPEG 2000 decoder (`IsoFaceRgbDecoder`), PEM certificate trust anchor ingestion (`SbiJwtVerifier.fromPem`), and `AndroidKeyStoreSigner.ensureKey()`.
+- **M5 Evaluation Framework:** ISO/IEC 30107-3 aligned evaluation harness (`liveness.evaluation`), Wilson 95% CIs, worst-species headline APCER (marked `[EXPLORATORY]` when $N < 30$), BPCER with Rule of 30 validation ($N=40 \ge 30$ bona fide subjects on test split), CEN/TS 18099 IAD metrics table, and Monk scale fairness analyzer.
+- **M6 Documentation & Evaluator Tools:** Final technical design, multi-modal UI/UX guide (`UX_GUIDE.md`), evaluator walkthrough (`DEMO_SCRIPT.md`), ISO/IEC 30107-3 test report (`TEST_REPORT.md`), and decisions register (`decisions.md` ADR-001 to ADR-014).
 - **PAD Model Integration:** Shipped and qualified `MiniFASNetV2-SE` (FP32 1.82MB and INT8 612KB) via ONNX Runtime (`1.16.3`), with 128x128 RGB inputs verified empirically via `ModelQualificationTest`.
 - **Datasets:** Unpacked ONOT synthetic ICAO dataset (179 subjects, 5,811 images) and generated subject-disjoint manifests.
 
@@ -350,8 +350,8 @@ Messages keyed by state name, loaded from `UiMessages`.
 
 | Area | Current Status | Notes |
 |------|---------------|-------|
-| Same-face | Reference 128-D spatial embedder active | Deep neural model (OpenCV Zoo SFace / ArcFace) pluggable via `FaceEmbedder` interface with calibrated 0.60 threshold |
-| Face detection | Landmark detector with pose gate active | OpenCV Zoo YuNet integration |
+| Same-face | SFace neural embedder active (`SFaceEmbedder`) | Calibrated at threshold $\tau = 0.48$ (FAR 4/100, FRR 1/50, ADR-012); cross-stream mobile pair collection tracked in `AUDIT_TODO.md` [Part 2 X5] |
+| Face detection | Landmark detector with pose gate active | Production neural detector (YuNet / SCRFD) integration tracked in [Part 2 X10] |
 | JavaFX UI | Event schema (`ui-contract`) defined | Desktop GUI widget bindings (Flutter mobile UI complete) |
 
 ---

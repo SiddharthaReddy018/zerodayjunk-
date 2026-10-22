@@ -132,3 +132,20 @@
 5. `WilsonConfidenceInterval.toString()` prints `[lower, upper]` (the old middle value was the Wilson centre, not the point estimate). `IadMetrics` rates return NaN with zero trials. Report header says "aligned", not "Compliant".
 6. Typed test counts removed from docs; the generated block in TEST_REPORT.md is the only source.
 **Still open:** see AUDIT_TODO.md.
+
+## ADR-014: Frame Sequence Monitor False Alarm Mitigation, Rule of 30 Contract, and Audit Log Sealing
+
+**Date:** 2026-10-22  
+**Status:** DECIDED  
+**Context:**  
+1. FrameSequenceMonitor previously raised false FROZEN/LOOP_REPLAY alarms on live, naturally still subjects because perceptual hash alone had collisions on static facial poses.  
+2. Evaluation reports previously risked quoting statistical conclusions without meeting the ISO/IEC 19795-1 Rule of 30 ($N \ge 30$).  
+3. Attestation signatures previously sealed the transcript SHA-256 without providing explicit API verification helpers or sealing the audit head on every session outcome.  
+4. The dev embedder check previously checked `getClass().getSimpleName().equals("ReferenceFaceEmbedder")` which could be bypassed by renaming the class.  
+**Decision:**  
+1. **Content Digest + Distance Window:** `FrameFingerprint` computes a 32-byte content digest (SHA-256 of 32x32 downsampled gray) alongside perceptual hash. `FrameSequenceMonitor` requires strict byte-identical digests across the freeze window for a freeze alarm, and non-adjacent loop matching ($gap \ge 1$), eliminating false alarms on live users (empirically verified over 200 noisy trials in `FrameSequenceMonitorFalsePositiveTest`).  
+2. **Rule of 30 Contract & Synthetic IAD Runner:** `EvaluationHarness` enforces $N \ge 30$ bona fide and attack subjects unless explicitly flagged `allowExploratory=true`. `EvaluationReport.validateContract()` strictly validates $N \ge 30$, 95% Wilson intervals, non-pooled worst-species headline, unmeasured metrics documentation, and marks headline metrics `[EXPLORATORY]` when $N < 30$. Real synthetic presentations are driven through `IadMechanismRunner` into `FrameSequenceMonitor` and `RCaptureBindingVerifier`, producing measured bypass rates, latencies, and mechanism coverage.  
+3. **Audit Log Sealing in Attestation:** `Attestation` exposes `auditHeadHash()` and `auditLogHeadHash()` as well as `verifyAuditLog(AuditLog)` and `verifyAuditChain(AuditChain)`. Truncating or modifying even one audit event causes verification to fail.  
+4. **Interface-Level Production Guard:** `FaceEmbedder` defines `default boolean productionGrade() { return false; }`. Production embedders like `SFaceEmbedder` override it to return `true`. Outside development mode, `LivenessService` rejects any embedder where `!embedder.productionGrade()`, preventing bypass via renaming.  
+**Consequences:** Complete mathematical and architectural integrity across live capture sequence monitoring, statistical reporting contracts, audit sealing, and production security guards.
+

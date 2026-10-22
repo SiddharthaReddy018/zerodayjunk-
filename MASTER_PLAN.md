@@ -233,18 +233,17 @@ CLEAR_BONA_FIDE (score ≥ passThreshold) →  FINAL_CAPTURE
 - Landmark-based action detectors (EAR blink, mouth-ratio smile, yaw turn)
 - Same-face check (embedding model)
 
-**Tier B (ship only if each signal beats Tier A alone on dev split):**
-- Moiré/FFT energy analysis
-- Glare detection
-- Screen-bezel rectangle detector
-- LBP texture analysis
-- Temporal consistency (landmark jitter, optical-flow sanity)
-- Planar-homography residual during head turns
+### 5.2 Actual Production PAD Pipeline
 
-**Tier C (weight=0 by default; experiment only):**
-- Gaussian curvature from MediaPipe face-mesh depth — demoted from v1 (weight 0.15) because face-mesh depth is predicted from 2D; a printed face likely still produces face-like depth. Keep at weight 0 until it beats a baseline on held-out data.
-- Boundary flicker
-- Colour naturalness — fairness risk (skin-tone dependent); use as a diagnostic only unless data shows no skin-tone gap across Monk Tone scale.
+The production PAD pipeline consists of a focused, verified multi-layer architecture:
+1. **Neural PAD Scorer:** Single-model `MiniFASNetV2-SE` running via ONNX Runtime (`MiniFasNetScorer` + `PadPreprocessor`: 1.5x face crop, reflect-101 border padding, 128x128 RGB input, 0-100 output probability).
+2. **Spatial PAD Aggregator:** `SpatialPadScorer` computes quality-weighted temporal aggregation across qualifying frames.
+3. **Capture Integrity (IAD):** `CaptureIntegrityChecker` enforcing SplitMix64 pHash + SHA-256 content digest sequence monitoring (freeze & non-adjacent loop detection), freshness checking, and transaction nonce binding.
+4. **Active Challenge-Response:** `ChallengeGenerator` + `ChallengeResponseValidator` for interactive anti-spoofing (EAR blink, MAR smile, yaw turn) with latency and session binding.
+5. **Cross-Stream Same-Face Check:** `SameFaceChecker` + `SFaceEmbedder` verifying identity consistency between host preview stream and final SBI capture (calibrated tau = 0.48).
+6. **Decision Engine:** `DecisionEngine` enforcing hard gates, 4-band routing (`LivenessPolicy`), and configurable attack persistence windows.
+
+*(Note: Seven experimental Tier B/C heuristic stubs--MoireAnalyzer, LbpTextureAnalyzer, ColourNaturalnessAnalyzer, GaussianCurvatureScorer, BoundaryConsistencyScorer, TemporalConsistencyAnalyzer, GeometryConsistencyAnalyzer--were removed in audit remediation; the production system relies on qualified neural PAD inference, spatial aggregation, challenge-response, and capture integrity).*
 
 ### 5.3 Hard Gates (applied before weighted fusion)
 
@@ -305,16 +304,14 @@ face-liveness-pad/
 │   │   ├── LivenessPolicy.java            (4-band routing, attackThreshold < passThreshold)
 │   │   └── LivenessConfig.java            (mosip.registration.liveness.* namespace)
 │   ├── engine/
-│   │   ├── SpatialPadScorer.java          (quality-weighted aggregate)
-│   │   ├── MiniFasNetScorer.java          (ONNX wrapper)
-│   │   ├── MoireAnalyzer.java
-│   │   ├── LbpTextureAnalyzer.java
-│   │   ├── ColourNaturalnessAnalyzer.java (Tier C; weight=0 default)
-│   │   ├── GaussianCurvatureScorer.java   (Tier C; weight=0 default)
-│   │   ├── BoundaryConsistencyScorer.java
-│   │   ├── TemporalConsistencyAnalyzer.java
-│   │   ├── GeometryConsistencyAnalyzer.java
-│   │   └── DecisionEngine.java            (hard gates + weighted fusion)
+│   │   ├── PadPreprocessor.java           (1.5x face crop, reflect-101 pad, 128x128 RGB)
+│   │   ├── MiniFasNetScorer.java          (ONNX Runtime native PAD scorer, 0-100 score)
+│   │   ├── SpatialPadScorer.java          (quality-weighted temporal aggregate)
+│   │   ├── SameFaceChecker.java           (cross-stream identity check, calibrated tau=0.48)
+│   │   ├── QualityGate.java               (blur, brightness, size, pose gating)
+│   │   ├── LandmarkDetector.java          (EAR, MAR, yaw detection for active challenges)
+│   │   ├── ModelRegistry.java             (SHA-256 verification + anti-rollback)
+│   │   └── DecisionEngine.java            (hard gates + band routing + attack persistence)
 │   ├── challenge/
 │   │   ├── BoundChallenge.java
 │   │   ├── ChallengeGenerator.java
@@ -1316,7 +1313,7 @@ Based on systems engineering reviews, the following "Group A" betterments are **
 ### 26.16 Production Stub Guard and Fail-Closed Components (ADR-010, HANDOFF R8)
 **Requirement:** No security decision may rest on a placeholder.
 - **Design:** `MiniFasNetScorer` loads its model or throws; `null` is the only explicit stub. `StubPolicy` refuses stub scorers and stubbed same-face checkers unless `-Dliveness.allowStubs=true` (set only by the test build). Frames that cannot be scored count as 0. The session feeds the PAD model through `PadPreprocessor` and feeds same-face through the injected `FaceEmbedder`; without an embedder the check fails closed. Modules whose backend is absent in a deployment (e.g. no JPEG 2000 decoder, no embedder) must reject, never approximate.
-- **Known gap by design:** `ReferenceFaceEmbedder` (an 8x8 luma/gradient grid) is a deterministic placeholder, not an identity model: unrelated images land well inside the 0.60 threshold. Production deployments must inject a trained embedder (SFace/ArcFace) and calibrate the threshold on their own data (R3).
+- **Production Embedder & Guard (ADR-014):** Test grid embedders are deterministic placeholders marked `productionGrade() = false` and rejected in production configurations. Production deployments inject `SFaceEmbedder` (calibrated tau = 0.48, `productionGrade() = true`) via `LivenessAndroidBootstrap`.
 
 ### 26.17 Evaluation Provenance (ADR-010, HANDOFF R9)
 **Requirement:** An evaluation number is only as good as the pipeline and data that produced it, and the report must say so.
