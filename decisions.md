@@ -75,7 +75,7 @@
 **Status:** DECIDED (Section 18.6, Section 21, Section 26.9)  
 **Context:** Android integration involves cross-stream binding between host CameraX frames (T3) and SBI `rCapture` intents (T1). Field deployments face mobile hardware latency limits, lack of native JPEG 2000 support, external face recognition model availability, and device-provider trust chains.  
 **Decision:**
-1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets. Empirically verified via native ONNX Runtime in `Int8ModelBenchmarkTest` (300 iterations: mean 8.15 ms, p50 8.00 ms, p95 9.45 ms), achieving >20x latency headroom for low-end devices.
+1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets. Measured by `Int8ModelBenchmarkTest` on a desktop JVM with synthetic input; the current figures are in the generated latency table of TEST_REPORT.md. This says nothing about phone latency, which is NOT MEASURED (Part 2 X6); no low-end-device headroom is claimed.
 2. **Same-Face Consistency:** Provided `ReferenceFaceEmbedder` (128-D normalized spatial descriptor) for out-of-the-box cross-stream verification without external dependencies. Deep neural models (OpenCV Zoo SFace / ArcFace) plug into `FaceEmbedder` with a calibrated threshold of 0.48 cosine distance (ADR-012).
 3. **JPEG 2000 Safe Fail-Closed:** Handled ISO/IEC 19794-5 JPEG frames natively via Android `BitmapFactory`. For JPEG 2000, provided the `IsoFaceRgbDecoder.Jpeg2000Decoder` interface for optional OpenJPEG JNI injection; without one, the parser fails closed safely (`Result.EMBEDDING_FAILED`), preventing unverified image substitution.
 4. **JWT Trust Anchors:** Added `SbiJwtVerifier.fromPem()` to allow dynamic loading of MOSIP Device Provider root CAs from PEM assets.
@@ -184,3 +184,15 @@ An audit of commit `1fd2826` identified six residual integrity and configuration
 **Remaining Unvalidated:**  
 - **Part 2 X13 (Real-Camera Freeze and Loop Tuning):** All results above are synthetic mechanism-level verifications under simulated Gaussian sensor noise and subpixel drift. Tuning and thresholds for physical camera sensors, lens breathing, lighting flicker, and phone video replays remain unvalidated pending physical device testing.
 
+## ADR-016: Soft LOOP_REPLAY Policy and Mandatory Audit Count
+
+**Status:** Accepted.
+
+**Context:** Synthetic probes of the redesigned loop rule (ADR-015) showed that it catches large-motion loops but mostly misses low-motion loops (about 3 px/frame or less) and can fire on legitimate periodic motion (a nod) or large random motion. None of this is validated on real cameras (Part 2 X13), so a hard attack verdict from this signal alone is not justified. Separately, the attestation accepted an optional audit event count, so a missing count silently skipped the count check.
+
+**Decision:**
+1. `LivenessConfig.loopReplayHardFail` (default `false`). When false, `LOOP_REPLAY` is logged to the audit chain (`INTEGRITY_SOFT`) and the session is marked loop-suspected. A loop-suspected session cannot pass on a passive score alone: with active challenges enabled it is routed to a challenge; with them disabled it ends in `ENGINE_ERROR` (fail closed). Other integrity violations (frozen frame, timestamp, resolution, device identity) are unchanged and still end the session. Set `loopReplayHardFail=true` to restore the previous behaviour.
+2. `Attestation` requires a non-negative `auditEntryCount`; the count is always part of the signed string and always checked by `verifyAuditChain`. The legacy overloads without a count now supply 0, which fails closed against any non-empty chain.
+3. The IAD report prints per-row Wilson intervals and the loop-rule limits, and no longer prints a "mechanism coverage" headline.
+
+**Consequences:** A legitimate user who triggers a false loop signal is asked to complete a challenge instead of being blocked as an attacker. A real loop attack that also passes the challenge is not stopped by this rule alone. Choosing the hard or soft setting for deployment depends on Part 2 X13 measurements.

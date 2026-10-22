@@ -229,48 +229,34 @@ This document tracks items from Part 2 of the codebase audit (X1 - X15). It deta
 
 ---
 
-### [NOT MEASURED - Part 2 X12] Live Demographically Diverse Population Data Collection
-- **Prerequisites:**
-  - Institutional Review Board (IRB) / Ethics clearance for biometric data collection.
-  - Calibrated physical Presentation Attack Instruments (PAIs):
-    - Level A: High-resolution printed photos (matte and glossy paper), paper cutouts.
-    - Level B: High-definition tablet/monitor replays, curved displays.
-    - Level C: 3D silicone/latex masks, mannequin/wax models.
-- **User Action Steps:**
-  1. Recruit at least 30 subjects per demographic cohort (Monk skin tone scale 1 - 10, age strata, male/female) satisfying ISO/IEC 19795-1 Rule of 30 ($N \ge 30$).
-  2. Conduct live capture sessions under varied lighting conditions:
-     - Diffuse daylight (300-500 lux)
-     - Fluorescent indoor office lighting
-     - Low light (< 50 lux)
-     - High glare / directional backlight
-  3. Execute presentation attacks using prepared PAIs across all subjects.
-  4. Feed generated session logs into evaluation runner:
-     ```bash
-     mvn test -Dtest=BenchmarkReportRunnerTest -Dpad.model=datasets/models/MiniFASNetV2-SE.onnx
-     ```
+### [NOT MEASURED - Part 2 X12] Evidence Plan Without a 30-Subject Live Recording
+- **Constraint:** the team cannot recruit 30+ live subjects. Do not fake it; make claims that match the evidence.
+- **Plan (in order of value):**
+  1. Use public anti-spoofing / replay datasets for bona fide and attack samples (for example CASIA-FASD, Replay-Attack, MSU-MFSD, OULU-NPU, CelebA-Spoof). Check each licence or request form and the hackathon rules first (X14). Keep the manifest format and fix the dev/test split before looking at results.
+  2. Use a dataset with skin-tone labels for fairness, with its licence checked.
+  3. Optional small self-recording by 5 to 10 consenting teammates on the real phone pipeline: report as "N subjects, EXPLORATORY"; use it for demo realism and for X13, not for headline rates.
+  4. Print, screen replay and cutout attacks of a few volunteers on the phone pipeline: report N, number of subjects and Wilson CIs.
+  5. Keep the Limitations section in TEST_REPORT.md accurate.
 - **Acceptance Criteria:**
-  - Rule of 30 satisfied ($N \ge 30$ subjects per species).
-  - Bona Fide Presentation Classification Error Rate (BPCER) <= 1.0%.
-  - Attack Presentation Classification Error Rate (APCER) <= 10.0% across all evaluated PAI species.
+  - Every number carries its N, source and caveat.
+  - No claim implies a live BPCER, conclusive fairness, or coverage of species that were not tested.
 
 ---
 
-### [NOT MEASURED - Part 2 X13] Real-Camera Frame Freeze & Loop Replay Cadence Tuning
-- **Prerequisites:**
-  - Mobile device mounted on fixed tripod facing live stationary subjects and replay screens.
+### [NOT MEASURED - Part 2 X13] Real-Camera Frame Freeze & Loop Replay Tuning
+- **Why it matters:** loop detection is a soft signal (ADR-016) because synthetic probes show false alarms on periodic or large legitimate motion and misses on low-motion loops. Thresholds are not validated on any real camera.
+- **Prerequisites:** a phone on a tripod, a few teammates, a tablet or virtual-camera setup for replay.
 - **User Action Steps:**
-  1. Capture 50 sessions of live, perfectly still subjects staring at the camera:
-     - Observe sensor CMOS optical shot noise and auto-exposure/auto-focus hunting.
-     - Verify that `FrameSequenceMonitor` reports 0 `FRAME_FREEZE` and 0 `LOOP_REPLAY` flags.
-  2. Capture 50 sessions of physical video loop replays (e.g. tablet playing looping 6-frame head motion clip):
-     - Verify detection rate of `LOOP_REPLAY`.
-  3. If optical lens blurring shifts Hamming distances, fine-tune:
-     - `LivenessConfig.frameFreezeHammingDistanceBits` (default: 3)
-     - `LivenessConfig.loopHammingThresholdBits` (default: 10)
-     - `LivenessConfig.loopMinSegmentMotionBits` (default: 3)
+  1. Record 50 sessions of live subjects sitting very still, and 50 with natural movement (nodding, small sway). Count `FROZEN` and `LOOP_REPLAY` events per session.
+  2. Record 50 replay sessions of a looping head-motion clip at several motion sizes (small, medium, large). Count detections.
+  3. Tune on a dev recording set only, then check on a separate set. Parameters in `LivenessConfig`:
+     - `freezeHammingThreshold` (default 2), `freezeConsecutiveFrames` (default 5)
+     - `loopHammingThreshold` (default 6), `loopSequenceLengthK` (default 5), `loopMinSegmentMotionBits` (default 3)
+     - `frameFreezePHashWindowSize` / loop window (default 15, must be at least 2K+1)
+     - `loopReplayHardFail` (default false; switch to true only if false alarms are acceptably low)
 - **Acceptance Criteria:**
-  - 0 false positive freeze or loop detections on live stationary human subjects.
-  - >= 95% detection rate on repeated video loop replay attacks.
+  - False `FROZEN` or `LOOP_REPLAY` rate on legitimate sessions is measured with Wilson CIs and is acceptably low for the chosen hard/soft setting.
+  - Detection rate per loop motion size is reported, including the sizes that are missed.
 
 ---
 

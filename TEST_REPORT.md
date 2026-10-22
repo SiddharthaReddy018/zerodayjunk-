@@ -129,18 +129,21 @@ Note: Seven model qualification and execution tests (`ModelQualificationTest` x4
 
 ## Injection Attack Detection Metrics (CEN/TS 18099 concepts)
 
-| Attack Type | Attempts | Detected/Rejected | Rate |
-|---|---|---|---|
-| Freeze detection | 30 | 30 | 1.0000 |
-| Loop replay detection | 30 | 30 | 1.0000 |
-| Nonce-swap rejection | 30 | 30 | 1.0000 |
-| False IAD (legitimate) | 30 | 0 | 0.0000 |
+> Results are synthetic, mechanism-level, not real-camera.
+
+| Attack Type | Attempts | Detected/Rejected | Rate | 95% Wilson CI |
+|---|---|---|---|---|
+| Freeze detection | 30 | 30 | 1.0000 | [0.8865, 1.0000] |
+| Loop replay detection | 30 | 30 | 1.0000 | [0.8865, 1.0000] |
+| Nonce-swap rejection | 30 | 30 | 1.0000 | [0.8865, 1.0000] |
+| False IAD (legitimate) | 30 | 0 | 0.0000 | [0.0000, 0.1135] |
 
 > These are detection rates, NOT APCER values (Section 12.2).
+> Known limits of the loop rule (synthetic probes): short or low-motion loops (about 3 px/frame or less) are mostly missed;
+> periodic or large legitimate motion can look like a loop. Loop detection is a soft signal until real-camera tuning (Part 2 X13).
 
-- **Mechanism coverage:** 100.0%
 - **Overall IAD bypass rate:** 0.0000
-- **Average detection latency:** 0.01 ms
+- **Average detection latency:** 0.08 ms
 
 ---
 
@@ -269,8 +272,21 @@ Evaluated by streaming all 36 video recordings from the **Kaggle Anti-Spoofing R
 | Cut-out mask | **Secondary detection target** | Increased resistance; detection under favourable conditions |
 | Curved print | **Secondary detection target** | Increased resistance; detection under favourable conditions |
 | 2D rigid mask | **Secondary detection target** | Increased resistance; detection under favourable conditions |
-| 3D silicone/resin mask | **Experimental resistance** | Multi-cue analysis; no standalone detection claim |
-| Real-time deepfake | **Mitigation only** | Challenge-response binding + latency + temporal analysis; no detection guarantee |
+| 3D silicone/resin mask | **Experimental resistance** | No standalone detection claim |
+| Real-time deepfake | **Mitigation only** | Challenge-response binding + latency checks; no detection guarantee |
 | Injection attacks | **Architectural control (IAD)** | CaptureIntegrity module per CEN/TS 18099 concepts |
-| Frozen frame | **Detection** | Detected for identical pHash sequence; unmeasured in offline still benchmark |
-| Frame loop replay | **Detection** | Detected for repeated sequence window; unmeasured in offline still benchmark |
+| Frozen frame | **Detection** | Detected for byte-identical consecutive frames (content digest); synthetic mechanism test only, not measured on a real camera (Part 2 X13) |
+| Frame loop replay | **Detection** | Soft signal: a loop suspicion forces an active challenge (ADR-016); catches large-motion loops in synthetic tests, mostly misses low-motion loops, can fire on periodic legitimate motion; not measured on a real camera (Part 2 X13) |
+
+---
+
+## Limitations
+
+- BPCER is measured on still images (ONOT synthetic ICAO set); it is not a live-presentation BPCER.
+- Live-video bona fide evidence uses fewer than 30 subjects and is exploratory; no live BPCER is claimed.
+- Fairness analysis is exploratory: every demographic cell is below 30 subjects, only Monk tones 2, 4, 5 and 7 appear, and tones 8-10 are not covered.
+- Attack coverage: print, screen replay and cutout only; video replay, curved print, masks and deepfakes are not covered.
+- The operating threshold was chosen on a small dev split and is not validated on real cameras.
+- Latency figures come from a desktop JVM with synthetic input unless stated otherwise; on-phone latency is not measured (Part 2 X6).
+- Injection-attack numbers are synthetic, mechanism-level results; freeze and loop thresholds are not tuned on real cameras (Part 2 X13).
+- Same-face calibration used synthetic still pairs and the threshold was selected on the same pairs (ADR-012).
