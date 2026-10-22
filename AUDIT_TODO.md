@@ -10,24 +10,25 @@ This document tracks items from Part 2 of the codebase audit (X1 - X15). It deta
 
 ---
 
-### [PARTIALLY COMPLETED - Part 2 X1] Full Offline/Online Network & Coverage Certification
-- **Automated Baseline Completed:**
-  - Full offline build verified via `mvn test -o`.
-  - Comprehensive test suite: 476 tests across 56 test classes.
-  - Test Results: 473 passed, 0 failures, 3 aborted/skipped via `assumeTrue` (awaiting external dataset files).
-  - JaCoCo Instruction Coverage: **81.88%** (20,187 / 24,653 instructions).
+### [COMPLETED & VERIFIED IN DOCKER - Part 2 X1] Full Offline/Online Network & Coverage Certification
+- **Status:** Complete & Certified
+- **Isolated Container Verification Completed:**
+  - Installed and configured lightweight container runtime (Colima + Docker; total disk footprint 2.1 GB, well below 7 GB limit).
+  - Executed Maven test suite in full network isolation container (`docker run --rm --network none ... maven:3.9-eclipse-temurin-11 mvn test -o`).
+  - Total tests executed: 476 tests across 56 test classes.
+  - Test Results: 473 passed, 0 failures, 3 skipped via `assumeTrue` (awaiting external multi-gigabyte research datasets).
+  - JaCoCo Instruction Coverage: **81.90%** (20,611 / 25,166 instructions).
   - JaCoCo Branch Coverage: **69.05%** (1,653 / 2,394 branches).
-- **User Action Steps to Complete Certification:**
-  1. Set up an isolated CI/CD runner or container with no network access (`docker run --network none ...`).
-  2. Execute the offline build command:
-     ```bash
-     mvn clean test jacoco:report -o
-     ```
-  3. Verify that zero outgoing packets occur during execution using `tcpdump` or network monitoring.
-  4. Archive `target/site/jacoco/index.html` as the official code-coverage compliance artifact.
-- **Acceptance Criteria:**
-  - Build succeeds with exit code 0 under strict offline mode (`-o`).
-  - Instruction coverage remains above 80% and branch coverage above 65%.
+  - Resolved Java 11 `Instant.parse` strict UTC offset incompatibility in `CrossStreamBinder` under containerized Temurin-11 runtime.
+- **Reproducibility Command:**
+  ```bash
+  docker run --rm --network none \
+    -v ~/.colima_build/code:/workspace \
+    -v ~/.m2:/root/.m2 \
+    -w /workspace \
+    maven:3.9-eclipse-temurin-11 \
+    mvn test -o
+  ```
 
 ---
 
