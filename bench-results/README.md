@@ -15,3 +15,6 @@ Caveats for every file here: fixed-box detector (real detector cost NOT included
 
 ## 2026-10-23-run3-unplugged
 12 runs on the same build (4 INT8 lockstep, 4 FP32 lockstep, 4 FP32 paced), interleaved. Every JSON reports `charging: false`, thermal status 0 (1 at the end of the last paced run), battery temp 35-37 C, battery 71%. Each run is about 4-6 s. Airplane mode and Do Not Disturb are not recorded in the JSON; the owner reported them on.
+
+## DEV_AGREEMENT_REPORT-2026-10-23.md
+Output of `DevAgreementRunnerTest` (desktop JVM, DEV split only, FP32 vs INT8 at threshold 70). Not a phone result. Both model hashes are listed inside the report and match the hashes above.
