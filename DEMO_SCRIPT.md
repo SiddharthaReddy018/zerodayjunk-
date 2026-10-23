@@ -14,8 +14,8 @@ The system enforces ISO/IEC 30107-3 compliance, CEN/TS 18099 injection attack de
 ### Evaluation Highlights
 - **Automated Test Suite:** Complete automated unit, integration, and contract tests (count: see TEST_REPORT.md generated block) pass reliably.
 - **ISO/IEC 30107-3 Evaluation Harness:** Subject-disjoint benchmark with Wilson 95% confidence intervals, zero ACER reporting, and Monk Skin Tone fairness analysis.
-- **Mobile Model Latency:** Quantized INT8 ONNX model achieves **mean 10.86 ms, p95 14.51 ms** inference time on desktop JVM (tested against the $\le 200\text{ ms}$ mobile target; physical phone latency is unmeasured [Part 2 X6]).
-- **Zero Foundation Model Footprint:** Model budget $\le 5\text{ MB}$ (MiniFASNetV2-SE INT8 is 612 KB; FP32 is 1.82 MB), completely offline-capable.
+- **Mobile Model Latency:** The shipped Android model is FP32 (ADR-017). On a Nothing A001 phone (synthetic frames, fixed-box detector, unplugged) FP32 PAD inference measured mean 6.96-7.18 ms, p95 9.05-9.31 ms over 4 lockstep runs; capture + preprocess + PAD per-frame p95 was 14.64-14.95 ms against the $\le 200\text{ ms}$ target. Face detector, SFace, signing, camera copy and UI are not included. The INT8 desktop-JVM benchmark below (mean 10.86 ms, p95 14.51 ms) is for the unevaluated alternative model.
+- **Zero Foundation Model Footprint:** Model budget $\le 5\text{ MB}$ (shipped MiniFASNetV2-SE FP32 is 1.82 MB; the unevaluated INT8 alternative is 612 KB), completely offline-capable.
 - **Cryptographic Attestation:** ECDSA P-256 digital signature over canonical attestation token with non-null `imageSha256` binding, `auditHeadHash` sealing, and tamper-evident SHA-256 audit chaining.
 
 ---
@@ -57,7 +57,7 @@ mvn clean test
 
 ## 4. Step 2: Run the Mobile INT8 Inference Benchmark ($p95 \le 200\text{ ms}$)
 
-Validate the mobile inference speed of the quantized `MiniFASNetV2-SE-int8.onnx` (612 KB) model running directly via ONNX Runtime:
+Validate the inference speed of the quantized `MiniFASNetV2-SE-int8.onnx` (612 KB) alternative model running directly via ONNX Runtime. This is NOT the shipped Android model (ADR-017); it is kept as a benchmark of the unevaluated alternative:
 
 ```bash
 mvn test -Dtest=Int8ModelBenchmarkTest
