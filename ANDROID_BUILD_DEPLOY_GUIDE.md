@@ -188,7 +188,9 @@ public class MainActivity extends FlutterFragmentActivity {
 
         // 1. Model: MiniFasNetScorer takes a file Path, so copy the asset out of the APK.
         Path model = copyAsset("MiniFASNetV2-SE.onnx");
-        MiniFasNetScorer scorer = new MiniFasNetScorer(model);
+        // Pin the FP32 model hash (ADR-017). A mismatch throws SecurityException before any session is created.
+        final String PAD_MODEL_SHA256 = "af2381b88f38769222ed93379e12444e2a50814575de1c46170de570c55a42b6";
+        MiniFasNetScorer scorer = new MiniFasNetScorer(model, PAD_MODEL_SHA256);
         if (scorer.isStubMode()) {   // CRITICAL, see section 7: stub returns 80 = PASS
             throw new IllegalStateException("PAD model failed to load; refusing to start");
         }
@@ -196,6 +198,8 @@ public class MainActivity extends FlutterFragmentActivity {
         // 2. Production Engine & KeyStore Wiring (see LivenessAndroidBootstrap)
         Signer signer = AndroidKeyStoreSigner.ensureKey("liveness_attestation_key");
         Path sfaceModel = copyAsset("face_recognition_sface.onnx");
+        // NOTE: this Path constructor is unpinned. Production hosts should use LivenessAndroidBootstrap.init,
+        // which takes the SFace SHA-256 pin and calls the pinned byte[] constructor.
         SFaceEmbedder embedder = new SFaceEmbedder(sfaceModel);
         SameFaceChecker sameFaceChecker = new SameFaceChecker(0.48); // calibrated threshold (ADR-012)
 
