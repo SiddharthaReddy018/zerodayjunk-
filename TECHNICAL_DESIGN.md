@@ -12,7 +12,7 @@ This document describes the technical design of the face liveness detection and 
 - 94 source files, 37 test classes
 - automated test suite (count and pass rate: see TEST_REPORT.md generated block)
 - 13-state machine with table-driven transitions
-- Native ONNX Runtime inference (MiniFASNetV2-SE FP32 & INT8 quantized: mean 7.19 ms, p95 7.80 ms)
+- Native ONNX Runtime inference, MiniFASNetV2-SE FP32 on Android (ADR-017; INT8 is an unevaluated alternative). Phone PAD_INFER, Nothing A001, unplugged run3, synthetic frames: mean 6.96-7.18 ms, p95 9.05-9.31 ms. The earlier desktop JVM figure (mean 7.19 ms, p95 7.80 ms) is not a phone number and did not record which model produced it
 - ISO/IEC 30107-3 compliant evaluation harness with Wilson 95% CIs and Monk scale fairness analysis
 - Android CameraX + MOSIP SBI Intent bridge + Flutter UI platform channel
 - ECDSA P-256 signed attestation
