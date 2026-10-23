@@ -77,7 +77,7 @@ compileOnly 'io.flutter:flutter_embedding_release:1.0.0-<that hash>'
 
 ```
 mkdir -p android/liveness-android/src/main/assets
-cp /path/to/MiniFASNetV2-SE-int8.onnx android/liveness-android/src/main/assets/
+cp /path/to/MiniFASNetV2-SE.onnx android/liveness-android/src/main/assets/
 ```
 
 3d. Build:
@@ -187,7 +187,7 @@ public class MainActivity extends FlutterFragmentActivity {
         super.configureFlutterEngine(engine);
 
         // 1. Model: MiniFasNetScorer takes a file Path, so copy the asset out of the APK.
-        Path model = copyAsset("MiniFASNetV2-SE-int8.onnx");
+        Path model = copyAsset("MiniFASNetV2-SE.onnx");
         MiniFasNetScorer scorer = new MiniFasNetScorer(model);
         if (scorer.isStubMode()) {   // CRITICAL, see section 7: stub returns 80 = PASS
             throw new IllegalStateException("PAD model failed to load; refusing to start");
@@ -277,7 +277,7 @@ Checks (all by reading `CameraXController`): analysis is 640x480 YUV_420_888 wit
 | Rotation         | rotate phone mid-session                              | face stays upright to detector |
 | Lifecycle        | background 10 s, return                               | camera rebinds, no crash       |
 | Permission       | `adb shell pm revoke <app> android.permission.CAMERA` | frame timeout -> DEVICE_ERROR, no crash |
-| Model latency    | `ScorerBenchmark.run(ctx, "MiniFASNetV2-SE-int8.onnx", 30, 300)`, read `LivenessBench` | p95 << 200 ms (JVM test showed 9.45 ms; measure on the phone) |
+| Model latency    | `ScorerBenchmark.run(ctx, "MiniFASNetV2-SE.onnx", 30, 300)`, read `LivenessBench` | p95 << 200 ms (phone, FP32 lockstep PAD p95 about 9 ms, see ADR-017 and bench-results/) |
 | Environment      | run on rooted phone / emulator                        | `SESSION_COMPLETE{verdict:DEVICE_ERROR}`, no SBI launch |
 
 Record the phone model with every latency number you publish.

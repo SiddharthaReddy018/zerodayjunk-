@@ -75,7 +75,7 @@
 **Status:** DECIDED (Section 18.6, Section 21, Section 26.9)  
 **Context:** Android integration involves cross-stream binding between host CameraX frames (T3) and SBI `rCapture` intents (T1). Field deployments face mobile hardware latency limits, lack of native JPEG 2000 support, external face recognition model availability, and device-provider trust chains.  
 **Decision:**
-1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets. Measured by `Int8ModelBenchmarkTest` on a desktop JVM with synthetic input; the current figures are in the generated latency table of TEST_REPORT.md. This says nothing about phone latency, which is NOT MEASURED (Part 2 X6); no low-end-device headroom is claimed.
+1. **Inference Latency ($p95 \le 200\text{ ms}$):** Shipped `MiniFASNetV2-SE-int8.onnx` (612 KB) into Android assets (superseded by ADR-017: Android now ships FP32). Measured by `Int8ModelBenchmarkTest` on a desktop JVM with synthetic input; the current figures are in the generated latency table of TEST_REPORT.md. This says nothing about phone latency, which is NOT MEASURED (Part 2 X6); no low-end-device headroom is claimed.
 2. **Same-Face Consistency:** Provided `ReferenceFaceEmbedder` (128-D normalized spatial descriptor) for out-of-the-box cross-stream verification without external dependencies. Deep neural models (OpenCV Zoo SFace / ArcFace) plug into `FaceEmbedder` with a calibrated threshold of 0.48 cosine distance (ADR-012).
 3. **JPEG 2000 Safe Fail-Closed:** Handled ISO/IEC 19794-5 JPEG frames natively via Android `BitmapFactory`. For JPEG 2000, provided the `IsoFaceRgbDecoder.Jpeg2000Decoder` interface for optional OpenJPEG JNI injection; without one, the parser fails closed safely (`Result.EMBEDDING_FAILED`), preventing unverified image substitution.
 4. **JWT Trust Anchors:** Added `SbiJwtVerifier.fromPem()` to allow dynamic loading of MOSIP Device Provider root CAs from PEM assets.
@@ -196,3 +196,26 @@ An audit of commit `1fd2826` identified six residual integrity and configuration
 3. The IAD report prints per-row Wilson intervals and the loop-rule limits, and no longer prints a "mechanism coverage" headline.
 
 **Consequences:** A legitimate user who triggers a false loop signal is asked to complete a challenge instead of being blocked as an attacker. A real loop attack that also passes the challenge is not stopped by this rule alone. Choosing the hard or soft setting for deployment depends on Part 2 X13 measurements.
+
+## ADR-017: Android PAD model is FP32; INT8 is an unevaluated alternative
+
+**Status:** Accepted (Oct 23, 2026). Supersedes the model choice in ADR-009 item 1.
+
+**Context:** ADR-009 shipped `MiniFASNetV2-SE-int8.onnx` for latency, but every accuracy number in TEST_REPORT.md and the threshold 70 (ADR-011, calibrated on the DEV split) come from the FP32 model `MiniFASNetV2-SE.onnx`. INT8 has never been evaluated for accuracy; "INT8 same accuracy" is author-reported only. The INT8 file is dynamically quantized (DynamicQuantizeLinear/ConvInteger/MatMulInteger, no QDQ pairs). On the phone, INT8 is slower than FP32. Phone runs (Nothing A001, MT6878, 400 lockstep frames per run, fixed-box detector, synthetic frames). Headline run: unplugged, thermal status 0-1, battery temp 35-37 C (`bench-results/2026-10-23-run3-unplugged/`). An earlier plugged-in run (`bench-results/2026-10-23-run2-plugged-in/`) agrees within about 0.3 ms on means.
+
+| Metric (ms) | INT8 lockstep (4 runs) | FP32 lockstep (4 runs) |
+|---|---|---|
+| PAD_INFER mean | 10.07-10.31 | 6.96-7.18 |
+| PAD_INFER p95 | 10.69-10.74 | 9.05-9.31 |
+| Per-frame mean | 15.76-15.98 | 12.58-12.81 |
+| Per-frame p95 | 16.30-16.48 | 14.64-14.95 |
+| Per-frame p99 | 20.18-20.70 | 17.67-19.71 |
+
+FP32 paced at 30 fps (4 runs): PROCESS_TOTAL mean 11.88-11.98, PAD_INFER p95 8.63-8.69, 0 dropped frames, max timestamp gap 35-36 ms against the 400 ms rule.
+
+**Decision:**
+1. The Android PAD model is `MiniFASNetV2-SE.onnx` (FP32, 1.82 MB, within the 5 MB budget), the model that was evaluated and calibrated. The INT8 file stays in the repo's tooling and benchmarks as an unevaluated alternative and is not shipped.
+2. No hybrid or ensemble of FP32 and INT8 is adopted. INT8 is a quantized copy of the same network, so its errors are expected to correlate with FP32's (not measured), the cost would be both models per frame, and any combined score would need a new calibration and a new ADR. The DEV split (9 attacks) cannot support that, and the TEST split is reserved for the single frozen-threshold run (ADR-011).
+3. Any later INT8 adoption requires a DEV-split agreement report (same images, both models, score differences and decision flips at threshold 70, no TEST labels) and a new ADR.
+
+**Consequences:** The 200 ms target is met for the measured stages only (capture + preprocess + PAD, about 14.6-14.95 ms at p95 in lockstep). Not measured: real face detector, SFace embedding, signing, camera copy, UI, sustained thermal behavior (each run is only seconds long), a second phone. The numbers above are latency on synthetic frames, not accuracy.
