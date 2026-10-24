@@ -42,3 +42,6 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## camera-blur-candidates-thermal1
 16 live-camera runs comparing whole-frame Laplacian variance with face-crop candidates (re-blur ratio best). Labels partly contaminated, no gate chosen. Code on local branch feat/blur-candidates, not on main. See its README.
+
+## blur-flap-controlled-thermal1
+42 runs on 2026-10-24 with a hand-made flap defocus, plus controlled 3 sharp + 3 blur sets in two scenes. crop_ratio separates within a scene (gap 0.067), not across scenes. No gate chosen. Dim room not run. See the README inside this folder.
