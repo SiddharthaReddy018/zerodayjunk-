@@ -68,3 +68,13 @@ Supersedes the NOT VERIFIED line saying the session was never run at the real th
 
 ### Open design hole added
 - At the real threshold the absolute gate catches strong blur first, so the relative gate adds value only for blur that keeps Laplacian at or above 100. Not verified that such blur occurs in practice.
+
+## CORRECTION 2026-10-25 (supersedes the addendum line "NOT exercised at 100")
+
+Source: bench-results/session-real-gate-blur100-strongflip-rounds-thermal1-1 (8 runs, docs PR #24). One phone, one light, release build, real blurMinVariance 100, independent QualityGate probe.
+- The relative gate DID fire at the real threshold: blur_relative appeared in the audit trail in 2 of 6 strong-blur flips (both in round 1). It did not fire in the 3 flips of round 2, where the face was lost on 151 to 175 frames (guide.face.none). Controls: 0 of 2 fired (no false fire).
+- Roles are inferred from run order, not user-stated. Blur method was not recorded. The blur was strong (Laplacian fell to about 45-100, full_norm about 2.5x down), not the intended mild blur.
+- Why round 1 fired and round 2 did not is Not verified. Which gate rejected each frame is Not verified (the probe is independent of the audit trail). 2 of 6 is not a detection rate.
+- Still untested: blur that keeps Laplacian at or above 100 with the face detected.
+- The earlier Set 1 / Set 2 statements stay valid for those runs (probe set: relative gate not fired on the one flip).
+- A round 3 (face lost on all frames in 3 runs, control baseline about 3x different) is raw only and not documented.
