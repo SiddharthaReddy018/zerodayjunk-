@@ -49,3 +49,22 @@ OPEN DESIGN HOLES
 - Sessions with no samples bypass the check.
 - Class comment says "face crop" but full_norm uses the whole-frame bbox path.
 ```
+
+## ADDENDUM 2026-10-25 (real blurMinVariance 100)
+
+Supersedes the NOT VERIFIED line saying the session was never run at the real threshold. Current mains: code eeaca0b, docs e639ea3. One phone (Nothing A001), release build, relativeBlurEnabled(true), no verdict can fire. Roles and order are user-stated: control, flip near 12 s, control.
+
+### What was run at the real threshold 100 (6 runs, 2 sets)
+- Set 1, no probe (bench-results/session-real-gate-blur100-thermal0-1): blur_relative 0 in all 3 runs, including the flip run. Runs 1 and 2 stayed mostly in POSITIONING (312 and 323 of 330 frames). The flip run logged 4 quality_ok. QualityGate failure reasons were not recorded.
+- Set 2, with an independent per-frame QualityGate probe (bench-results/session-real-gate-blur100-probe-thermal1-1): controls passed the probe gate on 329 and 330 of 330 frames, blur_relative 0. Flip run: 152 pass, 174 guide.quality.blur, 4 guide.face.none of 330; Laplacian first below 100 at frame index 153; blur_relative 0.
+
+### Reading (limits of the evidence)
+- At the real threshold 100 on this phone, the absolute blur gate rejected this flap before the relative gate was reached. The relative gate was NOT exercised at 100 in this condition.
+- The 10.0-threshold result (gate fires on a flip) does not carry over to 100 from these runs.
+- Whether the relative gate fires for a milder blur that keeps Laplacian at or above 100 is Not verified.
+- The probe is an independent QualityGate evaluation on every captured frame, not the session audit trail. Differences from what the session itself gated are Not verified.
+- Why the Set 1 controls failed the gate more often than the Set 2 controls: Not verified.
+- One phone, one light, one flip run per set. Not a gate accuracy figure.
+
+### Open design hole added
+- At the real threshold the absolute gate catches strong blur first, so the relative gate adds value only for blur that keeps Laplacian at or above 100. Not verified that such blur occurs in practice.
