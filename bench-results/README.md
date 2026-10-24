@@ -45,3 +45,6 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## blur-flap-controlled-thermal1
 42 runs on 2026-10-24 with a hand-made flap defocus, plus controlled 3 sharp + 3 blur sets in two scenes. crop_ratio separates within a scene (gap 0.067), not across scenes. No gate chosen. Dim room not run. See the README inside this folder.
+
+## blur-dim-flapoff-thermal1
+4 flap-off runs in a dim room (Y brightness 12-13). full_norm stays above 0.035 but is likely noise-dominated; blur detection in the dark not shown. No gate chosen. See the README inside this folder.
