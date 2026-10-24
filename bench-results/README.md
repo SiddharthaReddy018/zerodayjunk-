@@ -72,3 +72,6 @@ Matched control, 6 runs alternating flap OFF/ON (order user-stated) in one sessi
 
 ## session-relative-gate-thermal0-1
 4 live-camera runs of a REAL LivenessSession with relativeBlurEnabled(true) (blurMinVariance lowered to 10.0, no verdict can fire, QualityGate not representative): 2 user-stated controls (no blur reason, stay PASSIVE), 2 user-stated flips (blur_relative in the audit trail, session returns to POSITIONING). Roles user-stated, flip time approximate, no per-frame Y recorded. One phone. See the README inside this folder.
+
+## session-real-gate-blur100-thermal0-1
+3 live-camera runs of a REAL LivenessSession with relativeBlurEnabled(true) at the REAL blurMinVariance 100 (user-stated: control, flip near 12 s, control). Runs 1 and 2 stayed mostly in POSITIONING, run 3 stayed PASSIVE; blur_relative 0 in all three, including the flip run. QualityGate failure reasons not recorded. One phone. See the README inside this folder.
