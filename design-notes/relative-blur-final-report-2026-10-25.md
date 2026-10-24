@@ -30,7 +30,8 @@ DECISIONS
 - Constants 30, 2.0, 1.5 are candidates, not fitted.
 
 NOT VERIFIED
-- LivenessSession with the flag on, live on the phone (no bench job builds a session; Maven test only, synthetic device).
+- LivenessSession with the flag on at the real blurMinVariance 100 on the phone (never run; the session bench ran with it lowered to 10.0).
+- UPDATE 2026-10-25 (after PR #24 and docs PR #19): a real LivenessSession with relativeBlurEnabled(true) WAS run live on the phone: 4 runs, 2 controls with no blur_relative entry and 2 flips with blur_relative in the audit trail. blurMinVariance lowered to 10.0, no verdict can fire, roles user-stated. See bench-results/session-relative-gate-thermal0-1/README.md. The 'no bench job builds a session' wording elsewhere in this report is superseded.
 - PACED composite run; FROZEN under rot270.
 - Other phones, lights, distances; hand shake or motion blur; face-region blur over a sharp background.
 - Accuracy against attacks.
