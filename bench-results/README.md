@@ -78,3 +78,6 @@ Matched control, 6 runs alternating flap OFF/ON (order user-stated) in one sessi
 
 ## session-real-gate-blur100-probe-thermal1-1
 3 live-camera runs of a REAL LivenessSession with relativeBlurEnabled(true) at the REAL blurMinVariance 100, plus an independent per-frame QualityGate probe (roles user-stated: control, flip near 12 s, control). Flip run: 174 of 330 frames failed the absolute blur gate (Laplacian below 100 from frame 153), blur_relative 0, so the relative gate was not exercised. Controls: 329 and 330 of 330 frames passed. Probe is not the audit trail. One phone. See the README inside this folder.
+
+## session-real-gate-blur100-strongflip-rounds-thermal1-1
+8 live-camera runs (2 rounds) of a REAL LivenessSession at the REAL blurMinVariance 100 with the independent QualityGate probe. Roles inferred from order, blur method not recorded; blur was strong, not mild. Flips: blur_relative fired in 2 of 6 (both round 1), 0 in round 2 where the face was often lost. Controls: 0 of 2 fired. Round 3 excluded. One phone. See the README inside this folder.
