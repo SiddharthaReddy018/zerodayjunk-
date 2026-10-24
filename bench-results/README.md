@@ -51,3 +51,9 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## blur-dim-flapon-thermal0-1
 4 flap-on runs in a dim room (user-stated; flap state not in the JSONs). full_norm p50 0.018-0.029 vs 0.247-0.278 flap-off dim; crop_ratio p50 0.434-0.454, no separation from flap-off dim. Confound: Y brightness 23-34 here vs 11.5-13.3 flap-off, so the room was not equally dark. No gate chosen. See the README inside this folder.
+
+## blur-dim-flapoff-btn5-thermal0-1
+3 flap-off runs (button 5, file label defocused, treated as sharp) in a dark room, Y p50 7-9, 300/300 one face each. full_norm p50 0.162-0.184, crop_ratio p50 0.489-0.499. Battery 38.0 C before. No gate chosen. See the README inside this folder.
+
+## blur-flapoff-bright-thermal0-1
+3 flap-off runs (button 4) in a brighter room, Y p50 81-83. full_norm p50 0.021-0.022 on sharp frames (same range as the flap-on dim runs), crop_ratio p50 0.429-0.443. Face counts: 300, 299 (1 multi), 281 (17 no-face, 2 multi). full_norm tracks brightness, so the 0.035 floor is not usable on current evidence. No gate chosen. See the README inside this folder.
