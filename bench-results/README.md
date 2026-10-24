@@ -60,3 +60,6 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## blur-flapoff-dark2-thermal1
 3 flap-off runs (button 4, user-stated) minutes after the Y 81-83 set, but at Y p50 8.8-9.6 (light or exposure changed, cause Not verified). full_norm p50 0.061-0.062 (btn5 set at similar Y: 0.162-0.184), crop_ratio p50 0.482-0.488. Faces 286 (14 no-face), 300, 300. full_norm is not explained by brightness alone. No gate chosen. See the README inside this folder.
+
+## blur-control-alt-thermal0-1
+Matched control, 6 runs alternating flap OFF/ON (order user-stated) in one session. full_norm p50 OFF 0.185-0.196 vs ON 0.057-0.065 (about 3x, no overlap); crop_ratio p50 goes the wrong way (ON 0.512-0.534 vs OFF 0.496-0.506). Y p50 drifted 6.8-11.7; blur vs exposure effect Not verified. No absolute threshold usable. No gate chosen. See the README inside this folder.
