@@ -18,3 +18,27 @@ Caveats for every file here: fixed-box detector (real detector cost NOT included
 
 ## DEV_AGREEMENT_REPORT-2026-10-23.md
 Output of `DevAgreementRunnerTest` (desktop JVM, DEV split only, FP32 vs INT8 at threshold 70). Not a phone result. Both model hashes are listed inside the report and match the hashes above.
+
+## 2026-10-24-yunet-after-0002
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## composite-latency-thermal3
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## pipeline-composite-lockstep-thermal1
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## pipeline-rot270-hot-thermal3
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## pipeline-rot270-vs-640-superhot-thermal3
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## camera-blur-survey-thermal2
+See the README inside this folder. (Index entry added 2026-10-24; this line makes no claim about its contents.)
+
+## pipeline-rot270-cool-thermal0-1
+6 runs (3 rot270 720x720, 3 640x480) of the composite pipeline, lockstep, thermal 0-1, battery 35-39 C, blur gate lowered to 10.0 (latency only). p95 within 200 ms in all 6. See its README.
+
+## camera-blur-candidates-thermal1
+16 live-camera runs comparing whole-frame Laplacian variance with face-crop candidates (re-blur ratio best). Labels partly contaminated, no gate chosen. Code on local branch feat/blur-candidates, not on main. See its README.
