@@ -69,3 +69,6 @@ Matched control, 6 runs alternating flap OFF/ON (order user-stated) in one sessi
 
 ## fullnorm-latency-thermal1
 2 runs of the fullFrameNorm microbenchmark (500 timed each): fullFrameNorm p50 1.223 / 1.221 ms vs toRgb p50 3.444 / 3.455 ms. Thermal status 1, battery 37.0 C, unplugged per JSON. No detector running. See the README inside this folder.
+
+## session-relative-gate-thermal0-1
+4 live-camera runs of a REAL LivenessSession with relativeBlurEnabled(true) (blurMinVariance lowered to 10.0, no verdict can fire, QualityGate not representative): 2 user-stated controls (no blur reason, stay PASSIVE), 2 user-stated flips (blur_relative in the audit trail, session returns to POSITIONING). Roles user-stated, flip time approximate, no per-frame Y recorded. One phone. See the README inside this folder.
