@@ -63,3 +63,9 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## blur-control-alt-thermal0-1
 Matched control, 6 runs alternating flap OFF/ON (order user-stated) in one session. full_norm p50 OFF 0.185-0.196 vs ON 0.057-0.065 (about 3x, no overlap); crop_ratio p50 goes the wrong way (ON 0.512-0.534 vs OFF 0.496-0.506). Y p50 drifted 6.8-11.7; blur vs exposure effect Not verified. No absolute threshold usable. No gate chosen. See the README inside this folder.
+
+## live-relative-gate-flip
+6 live-camera runs of BlurWindowGate (window 30, drop 2.0, y shift 1.5; candidates, not fitted), 330 frames each: one flip run (flap OFF then ON, flip time not recorded), one flap-OFF control, four no-flip runs. Flip run reports blur, control does not. LivenessSession not run. One phone. Thermal not recorded in these JSONs. See the README inside this folder.
+
+## fullnorm-latency-thermal1
+2 runs of the fullFrameNorm microbenchmark (500 timed each): fullFrameNorm p50 1.223 / 1.221 ms vs toRgb p50 3.444 / 3.455 ms. Thermal status 1, battery 37.0 C, unplugged per JSON. No detector running. See the README inside this folder.
