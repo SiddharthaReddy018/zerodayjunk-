@@ -7,7 +7,7 @@ Gate constants: window 30, drop_factor 2.0, y_shift_factor 1.5 (candidates, NOT 
 - blurMinVariance was LOWERED to 10.0 (blur_gate_override in each JSON) so live frames reach the relative hook. The QualityGate is NOT representative.
 - minQualifyingFrames is huge, so no PASS or failure verdict can fire. The runs show only whether the relative gate fires inside a real session. They say nothing about final PASS or attack detection.
 - Roles are USER-STATED, not in the JSONs: A and C flap OFF all run; B and D flap put on at about 12 s on the user's stopwatch, the two flip runs within about 0.5 s of each other (approximate; the flip frame is not recorded).
-- All four files carry condition_label sessflapoff. The flip button was coded with the label sessflip, yet its files say sessflapoff; cause Not verified. The label is not evidence of which button was tapped.
+- All four files carry condition_label sessflapoff. The code passes sessflip for the flip button (MainActivity), and no file is named sessflip, so by file name all four runs came from the flap-OFF button. B and D were therefore flips done by hand on that button. Inferred from file names; that the flip button was never tapped is Not verified.
 - The session JSONs contain NO per-frame Y (brightness), so a light shift cannot be checked here. light_unsteady count is 0 in all four.
 - One phone, one light, two flip runs. Not a repeatability or accuracy claim. Latency was not measured in this job.
 - Not verified: hand shake or motion blur, other phones, attacks, UI mapping of the reason strings.
