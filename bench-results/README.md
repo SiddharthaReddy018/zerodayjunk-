@@ -48,3 +48,6 @@ See the README inside this folder. (Index entry added 2026-10-24; this line make
 
 ## blur-dim-flapoff-thermal1
 4 flap-off runs in a dim room (Y brightness 12-13). full_norm stays above 0.035 but is likely noise-dominated; blur detection in the dark not shown. No gate chosen. See the README inside this folder.
+
+## blur-dim-flapon-thermal0-1
+4 flap-on runs in a dim room (user-stated; flap state not in the JSONs). full_norm p50 0.018-0.029 vs 0.247-0.278 flap-off dim; crop_ratio p50 0.434-0.454, no separation from flap-off dim. Confound: Y brightness 23-34 here vs 11.5-13.3 flap-off, so the room was not equally dark. No gate chosen. See the README inside this folder.
