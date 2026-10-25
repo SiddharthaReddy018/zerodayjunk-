@@ -320,6 +320,19 @@ In this session the operator reported: first run pass, turn right pass, turn lef
 - A held turn beyond the yaw gate can stall a challenge until timeout (timeout handling was fixed in PR #32 and was not seen firing on the phone).
 - No attack trial was run on a build that logs gate reasons in this session.
 
+### On-device live observations: second pass & engine remediation (2026-10-26 ~02:30 IST)
+
+A second diagnostic pass on device (Nothing A001, Nothing OS 2.5 / Android 14) with verbose transition and gate instrumentation identified the root causes of previous challenge anomalies and produced corresponding engine remedies:
+
+1. **Challenge Validator Sequence Index Bug:** Single-action challenges passed session `sequenceIndex` (e.g. 1 on second challenge) into validator checking `expectedSequence` of size 1. This caused an internal `INVALID_SEQUENCE_INDEX` reject. Fixed in `ChallengeResponseValidator` by indexing at 0 for singleton sequences. Verified on device (`TURN_LEFT` and `TURN_RIGHT` confirmed).
+2. **Quality Gate Yaw Limit During Turns:** The baseline 30-degree yaw limit dropped frames when subjects executed prompt turns (yaws -44 to -66 deg). The quality gate was enhanced with an active-challenge override (`TURN_YAW_LIMIT_DEG = 60.0`), allowing turned frames to reach landmark detection and confirm actions without dropping to `POSITIONING`.
+3. **Blink Detection Dynamics:** Device logs revealed that at ~3.5 fps with natural blinks (150-250 ms duration), two consecutive frames below EAR 0.20 were statistically improbable (open eyes 0.20-0.30, blink nadir 0.18-0.195). Calibrated `earBlinkThreshold` to 0.22 and `minActionFrames` to 1.
+4. **Challenge Timeout Bypass Remediation:** Identified and closed a critical bypass: previously, after challenge timeout, a retry returning `CLEAR_BONA_FIDE` in passive mode could advance to `FINAL_CAPTURE` without completing active challenges. `LivenessSession` now mandates that any active-enabled session must satisfy `confirmedChallenges >= minChallenges`.
+5. **Cold-Start Frame Sequence Anomaly:** First app launch occasionally triggered `IAD_FAILURE: TIMESTAMP_GAP` due to camera initialization delay exceeding 2x expected frame interval. `FrameSequenceMonitor` was updated with initial warm-up absorption (> 5 s gap on frame pair 1).
+6. **Blur Gate Motion Margin:** The raw Laplacian variance threshold of 100 was overly sensitive to head movement; relaxed to 60 to prevent false `guide.quality.blur` drops while preserving spoof defense.
+7. **Resting Pitch False Positives:** Phone front camera hold angles (-7 to -11 deg) caused spurious `LOOK_UP` detections; raised `pitchLookThreshold` to 20 deg and restricted the active mobile prompt pool to `BLINK`, `TURN_LEFT`, and `TURN_RIGHT`.
+8. **MOSIP SBI Architecture Verification:** Validated full Android SBI intent protocol (`io.sbi.device` discovery, Info, rCapture) with package visibility `<queries>`, `CrossStreamBinder` same-face embedding verification, and automatic host-camera fallback when no SBI vendor app is installed.
+
 ---
 
 ## Limitations

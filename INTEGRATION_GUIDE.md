@@ -356,4 +356,12 @@ String pemCertificate = "...PEM DATA...";
 SbiJwtVerifier verifier = SbiJwtVerifier.fromPem(pemCertificate);
 ```
 
+### 12.5 Host App SBI Discovery & Device Fallback
+The Android host integration supports dynamic discovery of MOSIP SBI vendor apps with automatic host-camera fallback:
+1. **Package Visibility:** `AndroidManifest.xml` queries `<intent><action android:name="io.sbi.device" /></intent>`.
+2. **Dynamic Discovery:** `AndroidSbiLauncher.resolveSbiPackages()` inspects available providers at startup. If present, `AndroidDeviceAdapter` routes final capture through `SbiIntentDeviceAdapter` with `CrossStreamBinder` same-face validation.
+3. **Standalone Fallback:** When deployed on standalone development devices without a registered SBI vendor APK, the host app engages `CameraOnlyDevAdapter` (`HOST_CAMERA_DEV_ONLY`), allowing full end-to-end testing of the liveness pipeline.
+4. **Challenge Calibration:** Active micro-challenges use calibrated mobile parameters (`earBlinkThreshold=0.22`, `minActionFrames=1`, challenge-active yaw threshold 60 deg) for reliable user confirmation on front-facing mobile sensors.
+
+
 
