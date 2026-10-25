@@ -280,6 +280,48 @@ Evaluated by streaming all 36 video recordings from the **Kaggle Anti-Spoofing R
 
 ---
 
+## On-Device Live Observations (one phone, one person, one session)
+
+These are developer observations from a single logcat capture. They are NOT accuracy figures, NOT APCER/BPCER, and NOT evidence of reliability. One phone (Nothing A001), one person, one session, debug-prints build of the host app (exact build type Not verified). The raw log is not stored in this repository.
+
+Capture: 2026-10-26, about 00:29 to 00:31 IST, host app, live face, no attack presentations.
+
+### Per-frame PAD score on a live face (68 scored frames)
+
+| Score band | Frames |
+|---|---|
+| 0-29 | 26 |
+| 30-59 | 9 |
+| 60-89 | 20 |
+| 90-99 | 13 |
+| 100 | 0 |
+
+- The per-frame score was bimodal on a mostly still live face. Blur metric (lap) was 108-320 and brightness 113-129 on the logged frames, so the quality gate was not the cause.
+- The session decision uses a cumulative weighted mean, not single frames, so this table does not by itself predict a session verdict.
+- Cause of the low-score runs: Not verified. Earlier explanations (pose, face box height) were retracted.
+- An earlier set of captures on the same phone showed per-frame scores of 97-100 on live faces. That differs from this capture. Both are small and uncontrolled.
+
+### Challenge behavior seen in the log
+
+- Two challenge episodes were entered from the passive uncertain band.
+- Episode 1 (prompt TURN_RIGHT): the head did not turn (yaw -0.7 to -3.4), yet the detector reported LOOK_UP on the last frame at pitch about -10. Resting pitch on this phone is about -4 to -12 degrees, so a resting face can be read as looking up.
+- Episode 2 (prompt TURN_LEFT): the detector reported LOOK_RIGHT for nine frames at yaw -10 to -12, then TURN_LEFT matched once at yaw 15.7. The next frame (yaw 28.6) shows the prompt advanced to LOOK_UP. The confirm rule is not visible in the log (Not verified).
+- From yaw 37 onward, every frame was rejected by the quality gate (guide.pose.yaw_exceeded) while the head stayed turned at yaw 43-48 for at least 2 s. Blur and brightness on those frames were normal.
+- No challenge completion and no challenge timeout were seen in the log. This build logs no verdict lines, so session outcomes cannot be mapped to log lines.
+
+### Operator-reported session outcomes (not log-verified)
+
+In this session the operator reported: first run pass, turn right pass, turn left blocked, look up blocked, still face blocked. These reports are not matched to log lines.
+
+### Consequences for claims
+
+- No claim is made about turn, look, or blink recognition on a device.
+- LOOK_UP and LOOK_DOWN are likely unreliable on this phone (pitch zero point depends on how the phone is held).
+- A held turn beyond the yaw gate can stall a challenge until timeout (timeout handling was fixed in PR #32 and was not seen firing on the phone).
+- No attack trial was run on a build that logs gate reasons in this session.
+
+---
+
 ## Limitations
 
 - BPCER is measured on still images (ONOT synthetic ICAO set); it is not a live-presentation BPCER.
