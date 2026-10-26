@@ -341,6 +341,22 @@ On-device verification of active head turns identified two interaction issues du
 3. **End-to-End Execution:** Verified complete state machine lifecycle on Nothing A001 phone (`PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> ACTION_CONFIRMED_MORE -> CHALLENGE_WAIT -> ACTION_CONFIRMED_DONE -> FINAL_CAPTURE -> VERIFYING_FINAL -> SUCCESS`).
 4. **Cadence Jitter Absorption:** Profile face detection and GC pauses during compound challenges (e.g. `BLINK` transitioning to `TURN_LEFT`) caused occasional inference intervals between 400-600ms, triggering false `TIMESTAMP_GAP` violations under the initial 200ms expectation. Increased `DEFAULT_EXPECTED_INTERVAL_MS` to 500ms (1000ms gap ceiling) and frame timeout to 5000ms.
 
+### On-device live observations: false attack elimination & pose-aware PAD scoring (2026-10-26 ~12:30 IST)
+
+Three consecutive live resident registration trials on Nothing A001 phone highlighted an interaction between 2D spatial PAD and active challenge motion where bona fide presentations were blocked as presentation attacks (`BLOCKED_ATTACK` / `Verdict.ATTACK`):
+
+1. **Non-Frontal PAD Score Drop During Head Turns:** MiniFASNet 2D spatial PAD was trained on frontal faces. When the subject turned their head for `TURN_LEFT` or `TURN_RIGHT` (yaw 35°–60°), the 2D texture representation skewed, causing raw scores to drop into the attack band (< 30).
+2. **Missing Persistence Counter Reset in Active Challenge State:** In `processFrameDuringChallenge`, `decisionEngine.recordWindow(band)` was only called when `band == CLEAR_ATTACK`. Non-attack frames (`UNCERTAIN` or `CLEAR_BONA_FIDE`) never reset the consecutive window counter, allowing sporadic drops across the entire challenge duration to accumulate to `attackPersistenceWindows` (3) and trigger `CHALLENGE_PAD_FLAG`.
+3. **Remediation Implemented:**
+   - **Pose Gating for Spatial PAD:** Enforced `isFrontalForPad` in `processFrameDuringChallenge` and `spatialPad.addFrame`: turned frames (`|yaw| > poseMaxYawDeg` or `|pitch| > poseMaxPitchDeg`) are used exclusively for landmark action detection, not for frontal spatial PAD.
+   - **Consecutive Attack Persistence Reset:** `decisionEngine.recordWindow(band)` is now called on every frontal frame during active challenges, guaranteeing that any bona fide or uncertain frame immediately clears the consecutive attack counter.
+   - **Frontal Frame Settling on Final Capture:** `CameraOnlyDevAdapter.captureFinal` drains transit frames and waits up to 2.5s for the subject to return to center (`|yaw| <= 20°`) after finishing a turn challenge.
+   - **Quality Degradation Isolation:** In `finishRCapture`, any non-frontal frame is classified as a pose/quality failure (`SAME_FACE_FAIL` -> `RETRY_AVAILABLE`), preventing false `BLOCKED_ATTACK` flags on profile frames.
+   - **Diagnostic Logcat Telemetry:** Added `TRANSITION:`, `SCORE:`, `BAND:`, and `CHALLENGE:` logging to `AuditLog` and expanded Android logcat buffer (`adb logcat -G 16M`) for real-time observability.
+4. **Verification:**
+   - 100% pass across all 660 Maven tests and integration suites (`Total: 660, Failures: 0, Errors: 0, Skipped: 0`).
+   - Clean Android APK build and device deployment (`host-app-debug.apk` installed and running under PID 26422).
+
 ---
 
 ## Limitations
