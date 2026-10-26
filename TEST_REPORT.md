@@ -333,6 +333,13 @@ A second diagnostic pass on device (Nothing A001, Nothing OS 2.5 / Android 14) w
 7. **Resting Pitch False Positives:** Phone front camera hold angles (-7 to -11 deg) caused spurious `LOOK_UP` detections; raised `pitchLookThreshold` to 20 deg and restricted the active mobile prompt pool to `BLINK`, `TURN_LEFT`, and `TURN_RIGHT`.
 8. **MOSIP SBI Architecture Verification:** Validated full Android SBI intent protocol (`io.sbi.device` discovery, Info, rCapture) with package visibility `<queries>`, `CrossStreamBinder` same-face embedding verification, and automatic host-camera fallback when no SBI vendor app is installed.
 
+### On-device live observations: turn challenge refinement & wrong-action isolation (2026-10-26 ~11:55 IST)
+
+On-device verification of active head turns identified two interaction issues during turn challenges:
+1. **Quality Gate Rejection During Active Motion:** In `CHALLENGE_WAIT`, turned faces with high yaw (>60 deg), pitch variations, or natural motion blur were discarded by the quality gate before reaching action detection, causing challenge timeouts. `TURN_YAW_LIMIT_DEG` was widened to 85 degrees and frames with a single detected face during `CHALLENGE_WAIT` are preserved for action evaluation.
+2. **Spurious Wrong-Action Triggering from Natural Blinks:** `detectAnyAction` previously checked all actions including `BLINK` while waiting for `TURN_LEFT`/`TURN_RIGHT`. Natural involuntary blinks (or EAR fluctuations during head turn) triggered spurious `WRONG_ACTION (detected BLINK)` and reset turn progress. `detectAnyAction` was restricted to check only directly conflicting opposite head movements (`TURN_LEFT` vs `TURN_RIGHT`), allowing uninhibited natural blinks while turning.
+3. **End-to-End Execution:** Verified complete state machine lifecycle on Nothing A001 phone (`PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> ACTION_CONFIRMED_MORE -> CHALLENGE_WAIT -> ACTION_CONFIRMED_DONE -> FINAL_CAPTURE -> VERIFYING_FINAL -> SUCCESS`).
+
 ---
 
 ## Limitations
