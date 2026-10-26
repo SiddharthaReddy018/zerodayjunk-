@@ -338,7 +338,7 @@ A second diagnostic pass on device (Nothing A001, Nothing OS 2.5 / Android 14) w
 On-device verification of active head turns identified two interaction issues during turn challenges:
 1. **Quality Gate Rejection During Active Motion:** In `CHALLENGE_WAIT`, turned faces with high yaw (>60 deg), pitch variations, or natural motion blur were discarded by the quality gate before reaching action detection, causing challenge timeouts. `TURN_YAW_LIMIT_DEG` was widened to 85 degrees and frames with a single detected face during `CHALLENGE_WAIT` are preserved for action evaluation.
 2. **Spurious Wrong-Action Triggering from Natural Blinks:** `detectAnyAction` previously checked all actions including `BLINK` while waiting for `TURN_LEFT`/`TURN_RIGHT`. Natural involuntary blinks (or EAR fluctuations during head turn) triggered spurious `WRONG_ACTION (detected BLINK)` and reset turn progress. `detectAnyAction` was restricted to check only directly conflicting opposite head movements (`TURN_LEFT` vs `TURN_RIGHT`), allowing uninhibited natural blinks while turning.
-3. **End-to-End Execution:** Verified complete state machine lifecycle on Nothing A001 phone (`PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> ACTION_CONFIRMED_MORE -> CHALLENGE_WAIT -> ACTION_CONFIRMED_DONE -> FINAL_CAPTURE -> VERIFYING_FINAL -> SUCCESS`).
+3. **Full State-Machine Run (developer-reported, log not stored in this repository):** Verified complete state machine lifecycle on Nothing A001 phone (`PASSIVE -> CHALLENGE_PROMPT -> CHALLENGE_WAIT -> ACTION_CONFIRMED_MORE -> CHALLENGE_WAIT -> ACTION_CONFIRMED_DONE -> FINAL_CAPTURE -> VERIFYING_FINAL -> SUCCESS`).
 4. **Cadence Jitter Absorption:** Profile face detection and GC pauses during compound challenges (e.g. `BLINK` transitioning to `TURN_LEFT`) caused occasional inference intervals between 400-600ms, triggering false `TIMESTAMP_GAP` violations under the initial 200ms expectation. Increased `DEFAULT_EXPECTED_INTERVAL_MS` to 500ms (1000ms gap ceiling) and frame timeout to 5000ms.
 
 ### On-device live observations: false attack elimination & pose-aware PAD scoring (2026-10-26 ~12:30 IST)
@@ -354,7 +354,7 @@ Three consecutive live resident registration trials on Nothing A001 phone highli
    - **Quality Degradation Isolation:** In `finishRCapture`, any non-frontal frame is classified as a pose/quality failure (`SAME_FACE_FAIL` -> `RETRY_AVAILABLE`), preventing false `BLOCKED_ATTACK` flags on profile frames.
    - **Diagnostic Logcat Telemetry:** Added `TRANSITION:`, `SCORE:`, `BAND:`, and `CHALLENGE:` logging to `AuditLog` and expanded Android logcat buffer (`adb logcat -G 16M`) for real-time observability.
 4. **Verification:**
-   - 100% pass across all 660 Maven tests and integration suites (`Total: 660, Failures: 0, Errors: 0, Skipped: 0`).
+   - All 651 Maven tests pass on the merged code (`Tests run: 651, Failures: 0, Errors: 0, Skipped: 0`, run from a checkout that has the git-ignored model and dataset files).
    - Clean Android APK build and device deployment (`host-app-debug.apk` installed and running under PID 26422).
 
 ---
