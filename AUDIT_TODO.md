@@ -88,6 +88,7 @@ This document tracks items from Part 2 of the codebase audit (X1 - X15). It deta
 ---
 
 ### [NOT MEASURED - Part 2 X5] SFace Calibration on Real Cross-Stream Mobile Pairs
+- **Scope note (2026-10-30, ADR-018):** the SBI part of this item is OUT OF SCOPE (no SBI device in the submission). Any camera-only part stays NOT MEASURED.
 - **Prerequisites:**
   - Target Android mobile handset with front camera.
   - Physical MOSIP L0/L1 SBI biometric face capture device.
@@ -210,7 +211,8 @@ This document tracks items from Part 2 of the codebase audit (X1 - X15). It deta
 
 ---
 
-### [NOT MEASURED - Part 2 X11] Real SBI / MDS Hardware & JPEG 2000 Native Decoder Integration
+### [OUT OF SCOPE - Part 2 X11] Real SBI / MDS Hardware & JPEG 2000 Native Decoder Integration
+- **Scope note (2026-10-30, ADR-018):** SBI/MDS hardware integration is out of scope for the submission. Code exists and is unit-tested only.
 - **Prerequisites:**
   - MOSIP-certified L0 or L1 biometric capture device (USB OTG or BLE).
   - Device vendor MDS (MOSIP Device Service) Android APK.
