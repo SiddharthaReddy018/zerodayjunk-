@@ -7,28 +7,48 @@
 <!-- BEGIN GENERATED:tests -->
 | Metric | Value |
 |---|---|
-| Total tests | 476 |
-| Passed | 473 |
+| Total tests | 651 |
+| Passed | 651 |
 | Failed/Errors | 0 |
-| Skipped | 3 |
-| Test classes | 56 |
+| Skipped | 0 |
+| Test classes | 97 |
 
 | Test class | Tests | Pass | Fail | Skip |
 |---|---|---|---|---|
 | `liveness.android.AndroidPipelineIntegrationTest` | 5 | 5 | 0 | 0 |
+| `liveness.android.BenchInputTest` | 7 | 7 | 0 | 0 |
+| `liveness.android.BlurCandidatesFullNormTest` | 2 | 2 | 0 | 0 |
+| `liveness.android.BlurCandidatesTest` | 5 | 5 | 0 | 0 |
+| `liveness.android.BlurWindowGateTest` | 5 | 5 | 0 | 0 |
+| `liveness.android.CameraOnlyDevAdapterTest` | 3 | 3 | 0 | 0 |
 | `liveness.android.CameraXDeviceAdapterTest` | 13 | 13 | 0 | 0 |
+| `liveness.android.CompositeFaceDetectorTest` | 12 | 12 | 0 | 0 |
 | `liveness.android.CrossStreamBinderTest` | 7 | 7 | 0 | 0 |
+| `liveness.android.EnvironmentIntegrityCheckerLocaleTest` | 2 | 2 | 0 | 0 |
 | `liveness.android.EnvironmentIntegrityCheckerTest` | 17 | 17 | 0 | 0 |
+| `liveness.android.FaceAlignerTest` | 6 | 6 | 0 | 0 |
 | `liveness.android.Int8ModelBenchmarkTest` | 1 | 1 | 0 | 0 |
 | `liveness.android.Iso19794FaceTest` | 6 | 6 | 0 | 0 |
+| `liveness.android.LatencyBenchmarkSeriesTest` | 7 | 7 | 0 | 0 |
 | `liveness.android.LatencyBenchmarkTest` | 5 | 5 | 0 | 0 |
 | `liveness.android.LivenessPlatformChannelTest` | 16 | 16 | 0 | 0 |
+| `liveness.android.MlKitLandmarkMapperTest` | 3 | 3 | 0 | 0 |
+| `liveness.android.PadBenchmarkTest` | 4 | 4 | 0 | 0 |
+| `liveness.android.PipelineBenchmarkBlurOverrideTest` | 2 | 2 | 0 | 0 |
+| `liveness.android.PipelineBenchmarkGateDiagTest` | 1 | 1 | 0 | 0 |
+| `liveness.android.PipelineBenchmarkTest` | 4 | 4 | 0 | 0 |
+| `liveness.android.RgbToYuvTest` | 5 | 5 | 0 | 0 |
+| `liveness.android.SFaceEmbedderPinTest` | 7 | 7 | 0 | 0 |
 | `liveness.android.SFaceEmbedderTest` | 2 | 2 | 0 | 0 |
-| `liveness.android.SbiCaptureFinalIntegrationTest` | 2 | 2 | 0 | 0 |
 | `liveness.android.SbiIntentBridgeTest` | 32 | 32 | 0 | 0 |
 | `liveness.android.SbiJwtVerifierTest` | 19 | 19 | 0 | 0 |
+| `liveness.android.StageTimerTest` | 5 | 5 | 0 | 0 |
 | `liveness.android.TestGridEmbedderTest` | 3 | 3 | 0 | 0 |
 | `liveness.android.UiEventContractTest` | 4 | 4 | 0 | 0 |
+| `liveness.android.YuNetDecodeParityTest` | 2 | 2 | 0 | 0 |
+| `liveness.android.YuNetDetectorBenchmarkTest` | 3 | 3 | 0 | 0 |
+| `liveness.android.YuNetFaceDetectorTest` | 9 | 9 | 0 | 0 |
+| `liveness.android.YuNetInputPreprocessorTest` | 3 | 3 | 0 | 0 |
 | `liveness.audit.AuditChainIntegrityTest` | 14 | 14 | 0 | 0 |
 | `liveness.audit.AuditSealTest` | 6 | 6 | 0 | 0 |
 | `liveness.capture.FrameSequenceMonitorFalsePositiveTest` | 5 | 5 | 0 | 0 |
@@ -37,31 +57,48 @@
 | `liveness.capture.FreshnessCheckerClockSkewTest` | 9 | 9 | 0 | 0 |
 | `liveness.challenge.ChallengeGeneratorTest` | 12 | 12 | 0 | 0 |
 | `liveness.challenge.ChallengeResponseValidatorTest` | 5 | 5 | 0 | 0 |
+| `liveness.core.FaceFrameContentDigestTest` | 4 | 4 | 0 | 0 |
+| `liveness.core.FaceFrameFullNormTest` | 3 | 3 | 0 | 0 |
 | `liveness.crypto.AndroidKeyStoreSignerTest` | 3 | 3 | 0 | 0 |
+| `liveness.crypto.AttestationCountMandatoryTest` | 3 | 3 | 0 | 0 |
 | `liveness.crypto.AttestationCoverageTest` | 3 | 3 | 0 | 0 |
 | `liveness.crypto.AttestationTest` | 19 | 19 | 0 | 0 |
-| `liveness.device.MdsHttpDeviceAdapterTest` | 8 | 8 | 0 | 0 |
+| `liveness.desktop.DesktopJpegDecoderTest` | 2 | 2 | 0 | 0 |
+| `liveness.desktop.LivenessServiceRealPixelIntegrationTest` | 2 | 2 | 0 | 0 |
+| `liveness.desktop.MdsHttpDeviceAdapterTest` | 8 | 8 | 0 | 0 |
+| `liveness.desktop.ModelScoreDirectionQualificationTest` | 1 | 1 | 0 | 0 |
+| `liveness.desktop.SbiCaptureFinalIntegrationTest` | 2 | 2 | 0 | 0 |
 | `liveness.device.MockDevicePerceptualHashTest` | 4 | 4 | 0 | 0 |
+| `liveness.engine.ChallengeActionDirectionTest` | 2 | 2 | 0 | 0 |
+| `liveness.engine.FaceInFrameGateTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.LandmarkDetectorTest` | 5 | 5 | 0 | 0 |
+| `liveness.engine.LandmarkLayoutTest` | 11 | 11 | 0 | 0 |
+| `liveness.engine.MiniFasNetScorerBytesTest` | 6 | 6 | 0 | 0 |
 | `liveness.engine.MiniFasNetScorerFailClosedTest` | 3 | 3 | 0 | 0 |
-| `liveness.engine.ModelQualificationTest` | 4 | 4 | 0 | 0 |
+| `liveness.engine.ModelQualificationTest` | 3 | 3 | 0 | 0 |
 | `liveness.engine.ModelRegistryTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.PadPreprocessorTest` | 5 | 5 | 0 | 0 |
 | `liveness.engine.PoseGateRawUnitsTest` | 4 | 4 | 0 | 0 |
+| `liveness.engine.PoseUnavailableGateTest` | 6 | 6 | 0 | 0 |
 | `liveness.engine.SameFaceCheckerTest` | 4 | 4 | 0 | 0 |
 | `liveness.engine.SpatialPadScorerTest` | 4 | 4 | 0 | 0 |
 | `liveness.evaluation.AttackTaxonomyTest` | 2 | 2 | 0 | 0 |
-| `liveness.evaluation.BenchmarkReportRunnerTest` | 1 | 0 | 0 | 1 |
+| `liveness.evaluation.AuditHardeningEvaluationTest` | 2 | 2 | 0 | 0 |
+| `liveness.evaluation.BenchmarkReportRunnerTest` | 1 | 1 | 0 | 0 |
+| `liveness.evaluation.DevAgreementReportTest` | 11 | 11 | 0 | 0 |
+| `liveness.evaluation.DevAgreementRunnerTest` | 1 | 1 | 0 | 0 |
 | `liveness.evaluation.EvalReportContractTest` | 13 | 13 | 0 | 0 |
 | `liveness.evaluation.EvaluationHarnessTest` | 8 | 8 | 0 | 0 |
+| `liveness.evaluation.EvaluationLocaleTest` | 3 | 3 | 0 | 0 |
 | `liveness.evaluation.EvaluationProvenanceTest` | 5 | 5 | 0 | 0 |
 | `liveness.evaluation.FairnessAnalyzerTest` | 8 | 8 | 0 | 0 |
+| `liveness.evaluation.IadMetricsReportTest` | 2 | 2 | 0 | 0 |
 | `liveness.evaluation.IadMetricsTest` | 2 | 2 | 0 | 0 |
 | `liveness.evaluation.ManifestLoaderTest` | 8 | 8 | 0 | 0 |
 | `liveness.evaluation.PadMetricsTest` | 11 | 11 | 0 | 0 |
 | `liveness.evaluation.WilsonCITest` | 8 | 8 | 0 | 0 |
-| `liveness.flow.AuditHardeningTest` | 5 | 5 | 0 | 0 |
-| `liveness.flow.BandRoutingTest` | 6 | 6 | 0 | 0 |
+| `liveness.flow.AuditHardeningTest` | 3 | 3 | 0 | 0 |
+| `liveness.flow.BandRoutingTest` | 7 | 7 | 0 | 0 |
 | `liveness.flow.DeviceErrorRecoveryTest` | 13 | 13 | 0 | 0 |
 | `liveness.flow.RetryRateLimiterWindowTest` | 1 | 1 | 0 | 0 |
 | `liveness.flow.StateMachineMatrixTest` | 41 | 41 | 0 | 0 |
@@ -69,14 +106,16 @@
 | `liveness.policy.BandTableTest` | 9 | 9 | 0 | 0 |
 | `liveness.policy.ChallengeProfileBoundsTest` | 22 | 22 | 0 | 0 |
 | `liveness.policy.StubPolicyTest` | 6 | 6 | 0 | 0 |
-| `liveness.service.LivenessServiceIntegrationTest` | 20 | 18 | 0 | 2 |
+| `liveness.service.BenchmarkSessionGuardTest` | 5 | 5 | 0 | 0 |
+| `liveness.service.ChallengeTimeoutTest` | 1 | 1 | 0 | 0 |
+| `liveness.service.LivenessServiceIntegrationTest` | 18 | 18 | 0 | 0 |
+| `liveness.service.LoopReplaySoftPolicyTest` | 5 | 5 | 0 | 0 |
 | `liveness.service.RealSameFaceWiringTest` | 5 | 5 | 0 | 0 |
+| `liveness.service.RelativeBlurSessionTest` | 7 | 7 | 0 | 0 |
 <!-- END GENERATED:tests -->
 
-### Aborted Tests (3 tests skipped via `assumeTrue`)
-Per project hard constraints, test execution never silently passes when external hardware, models, or datasets are absent. Three tests are reported as aborted (`Skipped` / `assumeTrue`):
-- `liveness.service.LivenessServiceIntegrationTest` (2 tests): Skipped because external dataset frame files (`datasets/onot/digital/...` and `datasets/attacks/print/...`) are not present in git repository (Part 2 X12, X13).
-- `liveness.evaluation.BenchmarkReportRunnerTest` (1 test): Skipped because evaluation manifest CSV (`datasets/manifests/evaluation_benchmark_manifest.csv`) is not present on disk (Part 2 X12).
+### Skipped Tests
+The table above is from a run of 651 tests with 0 failures, 0 errors and 0 skipped. That run was made from a checkout that had the git-ignored model and dataset files present. Tests that need external models or datasets skip via `assumeTrue` when those files are absent (an earlier run without them skipped 24 tests; that count was not re-run for this report).
 
 Note: Seven model qualification and execution tests (`ModelQualificationTest` x4, `SFaceEmbedderTest` x1, `Int8ModelBenchmarkTest` x1, `SbiCaptureFinalIntegrationTest` x1) pass when local ONNX model binaries matching `licence-register.md` are installed in `datasets/models/`.
 
@@ -359,6 +398,27 @@ Three consecutive live resident registration trials on Nothing A001 phone highli
 
 ---
 
+## Oct 30 FP32 release run (one phone, one person, N=3)
+
+Informal developer trial, N=3 live runs, one phone, one person; not a detection rate and not an accuracy figure. Build: host app **release** (signed with the debug key, local demo only), branch `fix/t1-t2-t4`, commit e59a582, installed with `./gradlew :host-app:installRelease`. Device: Nothing A001, Android 15. Capture: 2026-10-30, about 23:45 IST, user-run logcat. The raw log is not stored in this repository. No attack presentations were made in this capture. Whether runs 2 and 3 were the user's live face is not recorded; the challenge type issued, lighting and glasses are not recorded.
+
+Config in this run: FP32 `MiniFASNetV2-SE.onnx`, default `attackThreshold` 30 and `attackPersistenceWindows` 3, `forceChallenge` true, `minChallenges` 2 (log shows `min=2`), `minActionFrames` 2, `minTurnFrames` 2, timestamp-gap limit still widened (ADR-018 item 5).
+
+| Run | Final state | What the log shows |
+|---|---|---|
+| 1 | SUCCESS | PAD scores 97-100 on all scored frames (INT8 had given 0-31). First challenge timed out (yaw stayed near 3 deg), RETRY 1/3 granted. Then two actions confirmed (yaw about 49 and about -42), FINAL_PAD 100, COMMIT_CHECKS_PASS. A soft LOOP_REPLAY flag fired on the live face; it only forced a challenge. |
+| 2 | BLOCKED_ATTACK | Scores 100 for about 12 frames, then 85, 31, 19, 1, 10 with yaw flat (about -1 to -4 deg); `CHALLENGE_PAD_FLAG score=10`. Cause not established. |
+| 3 | BLOCKED_ATTACK | Scores 30, 10, 29, 2, 2, 12, 12 from the first frame; CLEAR_ATTACK after the persistence window. Cause not established. |
+
+Consequences for claims:
+- FP32 live PAD scores were high in run 1 and low in runs 2 and 3. Reliability of live acceptance is NOT established; two of three runs were blocked. Possible false rejects are not measured. No BPCER is claimed.
+- The challenge requires two confirmed actions by default (`min=2`), so a single stray action does not pass. A video containing two requested actions could still pass. Video replay is NOT defended.
+- A turn challenge was confirmed on device in run 1 (this supersedes "no confirmed on-device challenge turn" in earlier text).
+- Earlier Oct 30 device work (two release builds reaching TURN_RIGHT then SUCCESS; a head-movement video replay passing on the second attempt; a camera-permission failure; a timestamp-gap failure) is evidenced by commit messages only; no logs are stored.
+- The printed-photo, second-screen and replay trials (A5) were NOT re-run after the FP32 change. Not verified.
+
+---
+
 ## Limitations
 
 - BPCER is measured on still images (ONOT synthetic ICAO set); it is not a live-presentation BPCER.
@@ -369,3 +429,6 @@ Three consecutive live resident registration trials on Nothing A001 phone highli
 - Latency figures come from a desktop JVM with synthetic input unless stated otherwise; on-phone latency is not measured (Part 2 X6).
 - Injection-attack numbers are synthetic, mechanism-level results; freeze and loop thresholds are not tuned on real cameras (Part 2 X13).
 - Same-face calibration used synthetic still pairs and the threshold was selected on the same pairs (ADR-012).
+- Video replay is a known uncovered attack species (not in the evaluation set). The challenge logic does not defeat a video that contains the requested actions; it only raises the cost.
+- Not validated on device: attack presentations after the FP32 change (A5), live BPCER, a second phone, SBI/MDS hardware (out of scope, ADR-018), the Flutter screens, the JavaFX desktop UI (not delivered).
+- Test counts above (651) are from the earlier documented run. A later user-run `mvn test` on 2026-10-30 reported 654 run, 0 failures, 0 errors, 4 skipped (651 plus 3 new `MinTurnFramesConfigTest` tests); the table at the top was not regenerated.

@@ -1,4 +1,7 @@
 # Evaluator Demonstration Script
+
+> **Status note (2026-10-30, ADR-018):** Android uses the FP32 PAD model (ADR-017). SBI/MDS hardware integration is OUT OF SCOPE for the submission: the SBI code is implemented against the spec and unit-tested only, never exercised on a device. The submission demo is camera-only on the host app. Where this document says otherwise, this note wins. Not re-edited line by line.
+
 ## MOSIP Face Liveness Detection + Presentation Attack Detection (ZeroDay)
 ### Competition: MOSIP Decode 2026 -- Problem 04
 ### Artifact: `face-liveness-pad` | Version: 0.6.0 | Date: October 2026

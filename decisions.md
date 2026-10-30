@@ -221,3 +221,18 @@ FP32 paced at 30 fps (4 runs): PROCESS_TOTAL mean 11.88-11.98, PAD_INFER p95 8.6
 **DEV agreement, FP32 vs INT8 (desktop JVM, DEV split only, threshold 70):** 1030 images (1021 bona fide, 9 attack), 854 identical scores, mean absolute difference 1.05, max absolute difference 50, Pearson correlation 0.907. 10 decision flips: 9 bona fide FP32-accepts/INT8-rejects, 1 bona fide FP32-rejects/INT8-accepts, 0 attack flips. Bona fide rejected: FP32 5 of 1021, INT8 13 of 1021. Attacks accepted: 1 of 9 for both. Caveats: threshold 70 was calibrated on DEV with FP32, which favours FP32 on this split, so the size of the gap is not a clean estimate (its direction is clear); 9 attacks cannot separate the models on APCER; this is the desktop JVM, not the phone; bona fide images are stills.
 
 **Consequences:** The 200 ms target is met for the measured stages only (capture + preprocess + PAD, about 14.6-14.95 ms at p95 in lockstep). Not measured: real face detector, SFace embedding, signing, camera copy, UI, sustained thermal behavior (each run is only seconds long), a second phone. The numbers above are latency on synthetic frames, not accuracy.
+
+## ADR-018: Submission scope, host app reverted to FP32 and default thresholds, SBI out of scope
+
+**Status:** Accepted (Oct 30, 2026). Records the changes on branch `fix/t1-t2-t4` (commit e59a582).
+
+**Context:** Oct 30 device commits (5abcbe5 and later, up to f0d8b0c) made the host app load the INT8 model, lowered `attackThreshold` to 3, raised `attackPersistenceWindows` to 5, set `minActionFrames` 8 and `loopHammingThreshold` 4, and widened the timestamp-gap limit. These were dev workarounds. Reading the code showed: `minActionFrames` only applied to BLINK and SMILE (TURN always needed 1 frame); the 8-frame value at about 6 fps would likely make BLINK unpassable (not tested); `loopHammingThreshold` 4 makes loop detection weaker (match is `dist <= threshold`) and the loop rule is soft; INT8 contradicts ADR-017 and the threshold 70 was calibrated on FP32.
+
+**Decision:**
+1. Host app loads `MiniFASNetV2-SE.onnx` (FP32, SHA-256 af2381b88f38769222ed93379e12444e2a50814575de1c46170de570c55a42b6), per ADR-017.
+2. `attackThreshold(3)`, `attackPersistenceWindows(5)` and `loopHammingThreshold(4)` are removed; the config defaults (30, 3, 6) apply again. They were dev workarounds and are reverted.
+3. New config key `minTurnFrames` (default 1, bounds 1-10) applies a consecutive-frame requirement to TURN_LEFT and TURN_RIGHT. The host app sets `minActionFrames` 2 and `minTurnFrames` 2 (camera about 6 fps). `minChallenges` stays at its default of 2.
+4. SBI/MDS hardware integration is out of scope. The host app always uses `CameraOnlyDevAdapter`; the SBI detection branch and banner are removed from the host app. The SBI classes stay in the repo, unit-tested only, never exercised on a device.
+5. NOT changed: the timestamp-gap limit is still widened in the host app (`CameraXDeviceAdapter(..., 5_000L, 2_000L)`, about 4 s). This is a dev-only workaround for SFace latency after VERIFYING_FINAL; it weakens the freeze/injection check for the whole session. A proper fix (reset the sequence monitor around VERIFYING_FINAL) is not done.
+
+**Consequences:** Challenge logic cannot stop a video that contains the requested action; it only raises the cost. Video replay is NOT defended. Desktop JVM suite after the change: 654 run, 0 failures, 0 errors, 4 skipped (user-run `mvn test`, 2026-10-30). Device evidence for this change: see TEST_REPORT.md, section "Oct 30 FP32 release run". It is N=3, one phone, one person, and not an accuracy figure.
